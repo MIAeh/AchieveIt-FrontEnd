@@ -3,10 +3,10 @@
     <el-tabs type="border-card">
       <el-row class="dashboard-row">
         <el-col :span="4">
-          <el-button type="primary" icon="el-icon-plus">新建项目</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleAddProject">新建项目</el-button>
         </el-col>
         <el-col :span="8" :offset="12">
-          <el-input v-model="input3" placeholder="搜索项目名称、状态、经理" class="input-with-select">
+          <el-input v-model="listQuery.searchCondition" placeholder="搜索项目名称、状态、经理" class="input-with-select">
             <el-button slot="append" icon="el-icon-search" />
           </el-input>
         </el-col>
@@ -59,9 +59,14 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Dashboard',
+  name: 'Project',
   data() {
     return {
+      listQuery: {
+        page: 1,
+        size: 10,
+        searchCondition: ""
+      },
       allProject: [
         {
           name: 'AchieveIt',
@@ -122,6 +127,11 @@ export default {
   },
   computed: {
     ...mapGetters(['name'])
+  },
+  methods: {
+    handleAddProject() {
+      this.$router.push('/project/addProject')
+    }
   }
 }
 </script>

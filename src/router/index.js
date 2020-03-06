@@ -46,12 +46,24 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/project',
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Project', icon: 'dashboard' }
+      path: 'project',
+      name: 'Project',
+      component: () => import('@/views/project/index'),
+      meta: { title: '项目列表', icon: 'dashboard' }
+    }]
+  },
+
+  {
+    path: '/project',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'addProject',
+      name: 'AddProject',
+      component: () => import('@/views/project/addProject'),
+      meta: { title: '新建项目'}
     }]
   },
 
