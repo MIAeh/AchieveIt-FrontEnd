@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <el-form ref="form" :model="form" label-width="80px">
+    <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       <el-col :span="12">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
@@ -9,7 +9,7 @@
           </div>
           <el-row>
             <el-col :span="12">
-              <el-form-item label="项目ID">
+              <el-form-item label="项目ID" prop="projectID">
                 <el-select
                   v-model="form.projectID"
                   filterable
@@ -31,7 +31,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="项目名称">
+              <el-form-item label="项目名称" prop="projectName">
                 <el-input v-model="form.projectName"></el-input>
               </el-form-item>
             </el-col>
@@ -55,7 +55,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="项目上级">
+              <el-form-item label="项目上级" prop="projectMonitorID">
                 <el-select
                   v-model="form.projectMonitorID"
                   filterable
@@ -76,7 +76,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="起止时间">
+          <el-form-item label="起止时间" prop="startDate">
             <el-col :span="11">
               <el-date-picker
                 type="date"
@@ -86,7 +86,7 @@
               ></el-date-picker>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
-            <el-col :span="11">
+            <el-col :span="11" prop="endDate">
               <el-date-picker
                 type="date"
                 placeholder="选择日期"
@@ -97,21 +97,21 @@
           </el-form-item>
           <el-row>
             <el-col :span="12">
-              <el-form-item label="开发语言">
+              <el-form-item label="开发语言" prop="languages">
                 <el-select v-model="form.languages" multiple style="width: 100%" placeholder="请选择">
                   <el-option v-for="item in languagesList" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="开发框架">
+              <el-form-item label="开发框架" prop="frameworks">
                 <el-input type="textarea" v-model="form.frameworks"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">立即创建</el-button>
-            <el-button>取消</el-button>
+            <el-button @click="onSubmit">取消</el-button>
           </el-form-item>
         </el-card>
       </el-col>
@@ -125,28 +125,38 @@
               type="text"
             >新增里程碑</el-button>
           </div>
-          <el-form-item
-            v-for="(milestone, index) in form.projectMilestones"
-            :label="'里程碑' + index"
-            :key="index"
-          >
-            <el-row :gutter="5">
-              <el-col :span="10">
+          <el-row v-for="(milestone, index) in form.projectMilestones" :key="index">
+            <el-col :span="14">
+              <el-form-item
+                :label="'里程碑' + index"
+                :prop="'projectMilestones.' + index + '.contents'"
+                :rules="{
+              required: true, message: '内容不能为空', trigger: 'blur'
+            }"
+              >
                 <el-input type="textarea" v-model="milestone.contents"></el-input>
-              </el-col>
-              <el-col :span="8">
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item
+                label-width="0"
+                :prop="'projectMilestones.' + index + '.time'"
+                :rules="{
+              required: true, message: '时间不能为空', trigger: 'blur'
+            }"
+              >
                 <el-date-picker
                   type="date"
                   placeholder="选择日期"
                   v-model="milestone.time"
                   style="width: 100%"
                 ></el-date-picker>
-              </el-col>
-              <el-col :span="2">
-                <el-button v-show="index" @click.prevent="removeDomain(milestone)">删除</el-button>
-              </el-col>
-            </el-row>
-          </el-form-item>
+              </el-form-item>
+            </el-col>
+            <el-col :span="2">
+              <el-button type="text" v-show="index" @click.prevent="removeDomain(milestone)">删除</el-button>
+            </el-col>
+          </el-row>
         </el-card>
       </el-col>
     </el-form>
@@ -174,7 +184,7 @@ export default {
             contents: ""
           }
         ],
-        languages: "",
+        languages: [],
         frameworks: ""
       },
       languagesList: ["Java", "C", "C++"],
@@ -233,7 +243,48 @@ export default {
         "West Virginia",
         "Wisconsin",
         "Wyoming"
-      ]
+      ],
+      rules: {
+        projectID: [
+          { required: true, message: "请选择项目ID", trigger: "change" }
+        ],
+        projectName: [
+          { required: true, message: "请填写项目名称", trigger: "blur" }
+        ],
+        projectMonitorID: [
+          { required: true, message: "请选择项目上级", trigger: "change" }
+        ],
+        startDate: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        endDate: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        languages: [
+          {
+            type: "array",
+            required: true,
+            message: "请至少选择一个开发语言",
+            trigger: "change"
+          }
+        ],
+        frameworks: [
+          { required: true, message: "请填写开发框架", trigger: "blur" }
+        ],
+        projectMilestones: [
+          { required: true, message: "请填写开发框架", trigger: "blur" }
+        ]
+      }
     };
   },
   mounted() {
