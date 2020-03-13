@@ -63,7 +63,19 @@ export const constantRoutes = [
       path: 'addProject',
       name: 'AddProject',
       component: () => import('@/views/project/addProject'),
-      meta: { title: '新建项目'}
+      meta: { title: '新建项目' }
+    }]
+  },
+
+  {
+    path: '/project',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'projectInfo',
+      name: 'ProjectInfo',
+      component: () => import('@/views/project/projectInfo'),
+      meta: { title: '项目信息' }
     }]
   },
 
