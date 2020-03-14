@@ -12,7 +12,7 @@
         </el-col>
       </el-row>
       <el-tab-pane label="全部项目" @click="getList('all')">
-        <el-table :data="allProject" border style="width: 100%">
+        <el-table :data="allProject" border style="width: 100%" @row-click="handleClickProject">
           <el-table-column prop="name" label="项目名称" width="180" />
           <el-table-column prop="status" label="项目状态" width="120" />
           <el-table-column prop="manager" label="项目上级" width="120" />
@@ -135,6 +135,9 @@ export default {
   methods: {
     handleAddProject() {
       this.$router.push('/project/addProject')
+    },
+    handleClickProject() {
+      this.$router.push('/project/projectInfo')
     }
   }
 }
