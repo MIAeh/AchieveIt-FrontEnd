@@ -50,7 +50,7 @@
             <el-col :span="12">
               <el-form-item label="公司名称">
                 <el-input
-                  v-model="form.client_contact_name"
+                  v-model="form.client_company"
                   :disabled="true"
                   style="width: 100%"
                 >
@@ -145,7 +145,7 @@
           <div slot="header" class="clearfix">
             <span>功能列表</span>
             <el-button
-              @click.prevent="addFunction"
+              @click.prevent="createFunction"
               style="float: right; padding: 3px 0"
               type="text"
             >新增功能</el-button>
@@ -165,6 +165,72 @@
         </el-card>
       </el-col>
     </el-form>
+
+    <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
+      <el-form
+        :model="newFunction"
+        label-position="top"
+        :rules="newFunctionRules"
+      >
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="newFunction.title"></el-input>
+        </el-form-item>
+        <el-form-item label="所属项目">
+          <el-input v-model="newFunction.project" :disabled="true"></el-input>
+        </el-form-item>
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="功能类型">
+              <el-select v-model="newFunction.type">
+                <el-option v-for="item in functionTypeList" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="一级父功能">
+              <el-select v-model="newFunction.firstFather">
+                <el-option v-for="item in firstFatherList" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="二级父功能">
+              <el-select v-model="newFunction.secondFather">
+                <el-option v-for="item in secondFatherList" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="描述">
+          <el-input type="textarea" v-model="newFunction.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="createFunctionDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="功能信息" :visible.sync="functionInfoDialogVisible">
+      <el-form :model="functionInfo">
+        <el-form-item label="ID">
+          <el-input v-model="functionInfo.id" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="标题">
+          <el-input v-model="functionInfo.title"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-input v-model="functionInfo.createTime" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input type="textarea" v-model="functionInfo.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="functionInfoDialogVisible = false">保 存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -174,15 +240,15 @@
     data() {
       return {
         form: {
-          projectID: "",
-          projectName: "",
-          client_id: "",
-          client_contact_name: "",
-          client_company: "",
-          startDate: "",
-          endDate: "",
-          projectMonitorID: "",
-          projectManagerID: "",
+          projectID: "54321",
+          projectName: "12345",
+          client_id: "007",
+          client_contact_name: "詹姆斯·邦德",
+          client_company: "军情六处",
+          startDate: "2020-03-14",
+          endDate: "2020-03-14",
+          projectMonitorID: "006",
+          projectManagerID: "005",
           projectMilestones: [
             {
               time: "",
@@ -207,7 +273,7 @@
                   children: [
                     {
                       id: "54321-0001-002-001",
-                      name: "二级功能1-2-1",
+                      name: "三级功能1-2-1",
                       project: "54321"
                     }
                   ]
@@ -228,11 +294,36 @@
           languages: "",
           frameworks: ""
         },
+        newFunction: {
+          title: "",
+          project: "",
+          type: "",
+          firstFather: "",
+          secondFather: "",
+          description: ""
+        },
+        newFunctionRules: {
+          title: [
+            {required: true, message: "请输入标题"}
+          ]
+        },
+        functionInfo: {
+          id: "54321-0001",
+          title: "一级功能1",
+          project: "54321",
+          createTime: "2020-03-14",
+          description: "一级功能1的描述"
+        },
+        functionTypeList: ["一级功能", "二级功能", "三级功能"],
+        firstFatherList: ["一级功能1", "一级功能2", "一级功能3"],
+        secondFatherList: ["二级功能1-1", "二级功能1-2"],
         languagesList: ["Java", "C", "C++"],
         options: [],
         value: [],
         list: [],
         loading: false,
+        createFunctionDialogVisible: false,
+        functionInfoDialogVisible: false,
         states: [
           "Alabama",
           "Alaska",
@@ -304,10 +395,10 @@
         this.form.client_company = data[1];
       },
       handleClickFunction() {
-
+        this.functionInfoDialogVisible = true;
       },
-      addFunction() {
-
+      createFunction() {
+        this.createFunctionDialogVisible = true;
       },
       removeDomain(item) {
         let index = this.form.projectMilestones.indexOf(item);
