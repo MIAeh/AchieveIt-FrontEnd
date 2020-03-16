@@ -135,6 +135,9 @@ export default {
   methods: {
     handleAddProject() {
       this.$router.push('/project/addProject')
+    },
+    handleClickProject() {
+      this.$router.push('/project/projectInfo')
     }
   }
 }

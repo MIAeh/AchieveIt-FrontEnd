@@ -114,25 +114,6 @@
             <el-button @click="onSubmit">取消</el-button>
           </el-form-item>
         </el-card>
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>成员管理</span>
-            <el-button @click="handleAddUser" style="float: right; padding: 3px 0" type="text">新增成员</el-button>
-          </div>
-          <el-tabs type="card">
-            <el-tab-pane label="项目成员(0)"></el-tab-pane>
-            <el-tab-pane label="EPG(0)"></el-tab-pane>
-            <el-tab-pane label="QA(0)"></el-tab-pane>
-            <el-tab-pane label="项目经理(0)"></el-tab-pane>
-            <el-tab-pane label="项目上级(0)"></el-tab-pane>
-          </el-tabs>
-          <el-table :data="form.userList" border style="width: 100%">
-            <el-table-column prop="userName" label="用户名" width="120" />
-            <el-table-column prop="userMail" label="邮箱" width="160" />
-            <el-table-column prop="userType" label="角色" width="120" />
-            <el-table-column prop="userManage" label="项目上级" />
-          </el-table>
-        </el-card>
       </el-col>
       <el-col :span="12">
         <el-card class="box-card">
@@ -177,127 +158,8 @@
             </el-col>
           </el-row>
         </el-card>
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>功能列表</span>
-            <el-button
-              @click.prevent="createFunction"
-              style="float: right; padding: 3px 0"
-              type="text"
-            >新增功能</el-button>
-          </div>
-          <el-table
-            :data="form.functions"
-            border
-            style="width: 100%"
-            @row-click="handleClickFunction"
-            row-key="id"
-            default-expand-all
-          >
-            <el-table-column prop="id" label="ID" show-overflow-tooltip="true" width="120" />
-            <el-table-column prop="name" label="标题" show-overflow-tooltip="true" />
-            <el-table-column prop="project" label="所属项目" show-overflow-tooltip="true" width="100" />
-          </el-table>
-        </el-card>
       </el-col>
     </el-form>
-
-    <el-dialog title="新增成员" :visible.sync="addUserFromVisible">
-      <el-form :model="addUserFrom" label-width="100px" label-position="center">
-        <el-row>
-          <el-form-item label="账号邀请">
-            <el-select
-              v-model="addUserFrom.userName"
-              filterable
-              remote
-              reserve-keyword
-              placeholder="请搜索项目上级"
-              :remote-method="remoteMethod"
-              :loading="loading"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="角色">
-            <el-select v-model="addUserFrom.userType" placeholder="请选择角色">
-              <el-option v-for="item in userTypeList" :key="item" :label="item" :value="item"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="addUserFrom = false">取消</el-button>
-        <el-button type="primary" @click="addUserSubmit">提交</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
-      <el-form :model="newFunction" label-position="top" :rules="newFunctionRules">
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="newFunction.title"></el-input>
-        </el-form-item>
-        <el-form-item label="所属项目">
-          <el-input v-model="newFunction.project" :disabled="true"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="功能类型">
-              <el-select v-model="newFunction.type">
-                <el-option v-for="item in functionTypeList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="一级父功能">
-              <el-select v-model="newFunction.firstFather">
-                <el-option v-for="item in firstFatherList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="二级父功能">
-              <el-select v-model="newFunction.secondFather">
-                <el-option v-for="item in secondFatherList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="描述">
-          <el-input type="textarea" v-model="newFunction.description"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="createFunctionDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog title="功能信息" :visible.sync="functionInfoDialogVisible">
-      <el-form :model="functionInfo">
-        <el-form-item label="ID">
-          <el-input v-model="functionInfo.id" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="标题">
-          <el-input v-model="functionInfo.title"></el-input>
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-input v-model="functionInfo.createTime" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input type="textarea" v-model="functionInfo.description"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="functionInfoDialogVisible = false">保 存</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -484,36 +346,7 @@ export default {
         projectMilestones: [
           { required: true, message: "请填写开发框架", trigger: "blur" }
         ]
-      },
-      addUserFromVisible: false,
-      addUserFrom: {
-        userName: null,
-        userType: null
-      },
-      userTypeList: ["EPG", "QA", "项目经理", "项目上级"],
-      newFunction: {
-        title: "",
-        project: "",
-        type: "",
-        firstFather: "",
-        secondFather: "",
-        description: ""
-      },
-      newFunctionRules: {
-        title: [{ required: true, message: "请输入标题" }]
-      },
-      functionInfo: {
-        id: "54321-0001",
-        title: "一级功能1",
-        project: "54321",
-        createTime: "2020-03-14",
-        description: "一级功能1的描述"
-      },
-      functionTypeList: ["一级功能", "二级功能", "三级功能"],
-      firstFatherList: ["一级功能1", "一级功能2", "一级功能3"],
-      secondFatherList: ["二级功能1-1", "二级功能1-2"],
-      createFunctionDialogVisible: false,
-      functionInfoDialogVisible: false
+      }
     };
   },
   mounted() {
@@ -556,19 +389,6 @@ export default {
       } else {
         this.options = [];
       }
-    },
-    handleAddUser() {
-      this.addUserFromVisible = true;
-      this.addUserFrom = {};
-    },
-    addUserSubmit() {
-      this.addUserFromVisible = false;
-    },
-    handleClickFunction() {
-      this.functionInfoDialogVisible = true;
-    },
-    createFunction() {
-      this.createFunctionDialogVisible = true;
     }
   }
 };
