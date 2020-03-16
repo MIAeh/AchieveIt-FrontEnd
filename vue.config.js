@@ -38,6 +38,13 @@ module.exports = {
       warnings: false,
       errors: true
     },
+    proxy: {
+      // detail: https://cli.vuejs.org/config/#devserver-proxy
+      [process.env.VUE_APP_BASE_API]: {
+        target: 'http://116.62.181.135:8080',
+        changeOrigin: true
+      }
+    },
     before: require('./mock/mock-server.js')
   },
   configureWebpack: {
