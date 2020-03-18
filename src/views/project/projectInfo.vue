@@ -1,186 +1,225 @@
 <template>
   <div class="dashboard-container">
-    <el-form ref="form" :model="form" label-width="80px">
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>项目信息</span>
-            <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
-          </div>
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="项目ID">
-                <el-input v-model="form.projectID" :disabled="true" style="width: 100%"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="项目名称">
-                <el-input v-model="form.projectName"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="客户ID">
-                <el-input v-model="form.client_id" :disabled="true" style="width: 100%"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="接口人">
-                <el-input v-model="form.client_contact_name" :disabled="true" style="width: 100%"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="公司名称">
-                <el-input v-model="form.client_company" :disabled="true" style="width: 100%"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="项目上级">
-                <el-input v-model="form.projectMonitorID" :disabled="true" style="width: 100%"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-form-item label="起止时间">
-            <el-col :span="11">
-              <el-date-picker
-                type="date"
-                placeholder="选择日期"
-                v-model="form.startDate"
-                style="width: 100%"
-              ></el-date-picker>
-            </el-col>
-            <el-col class="line" :span="2">-</el-col>
-            <el-col :span="11">
-              <el-date-picker
-                type="date"
-                placeholder="选择日期"
-                v-model="form.endDate"
-                style="width: 100%"
-              ></el-date-picker>
-            </el-col>
-          </el-form-item>
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="开发语言">
-                <el-select v-model="form.languages" multiple style="width: 100%" placeholder="请选择">
-                  <el-option v-for="item in languagesList" :key="item" :label="item" :value="item"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="开发框架">
-                <el-input type="textarea" v-model="form.frameworks"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">保存</el-button>
-            <el-button>取消</el-button>
-          </el-form-item>
-        </el-card>
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>成员管理</span>
-            <el-button @click="handleAddUser" style="float: right; padding: 3px 0" type="text">新增成员</el-button>
-          </div>
-          <el-tabs type="card">
-            <el-tab-pane label="项目成员(0)"></el-tab-pane>
-            <el-tab-pane label="EPG(0)"></el-tab-pane>
-            <el-tab-pane label="QA(0)"></el-tab-pane>
-            <el-tab-pane label="项目经理(0)"></el-tab-pane>
-            <el-tab-pane label="项目上级(0)"></el-tab-pane>
-          </el-tabs>
-          <el-table :data="form.userList" border style="width: 100%">
-            <el-table-column prop="userName" label="用户名" width="120" />
-            <el-table-column prop="userMail" label="邮箱" width="160" />
-            <el-table-column prop="userType" label="角色" width="120" />
-            <el-table-column prop="userManage" label="项目上级" width="120" />
-            <el-table-column fixed="right" label="操作" width="120">
-              <template slot-scope="scope">
-                <el-button
-                  @click.native.prevent="deleteRow(scope.$index, form.userList)"
-                  type="text"
-                  size="small"
-                >删除</el-button>
-                <el-button
-                  type="text"
-                  size="small"
-                >编辑上级</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>里程碑</span>
+    <el-tabs type="border-card">
+      <el-tab-pane label="基本信息">
+        <el-row>
+          <el-col :span="4">
             <el-button
-              @click.prevent="addDomain"
-              style="float: right; padding: 3px 0"
-              type="text"
-            >新增里程碑</el-button>
-          </div>
-          <el-row v-for="(milestone, index) in form.projectMilestones" :key="index">
-            <el-col :span="14">
-              <el-form-item
-                :label="'里程碑' + index"
-                :prop="'projectMilestones.' + index + '.contents'"
-              >
-                <el-input type="textarea" v-model="milestone.contents"></el-input>
+              type="primary"
+              icon="el-icon-edit"
+              @click="editMode = true"
+              v-if="!editMode"
+            >编辑模式</el-button>
+            <el-button type="primary" icon="el-icon-view" @click="editMode = false" v-else>浏览模式</el-button>
+          </el-col>
+          <el-col :span="4" :offset="16">
+            <el-button type="primary" @click="onSubmit" style="float:right" v-show="!editMode">保存</el-button>
+          </el-col>
+        </el-row>
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-col :span="12">
+            <el-card class="box-card-left">
+              <div slot="header" class="clearfix">
+                <span>项目信息</span>
+              </div>
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="项目ID">
+                    <el-input v-model="form.projectID" :disabled="true" style="width: 100%"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="项目名称">
+                    <el-input v-model="form.projectName" :disabled="editMode"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="客户ID">
+                    <el-input v-model="form.client_id" :disabled="true" style="width: 100%"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="接口人">
+                    <el-input
+                      v-model="form.client_contact_name"
+                      :disabled="true"
+                      style="width: 100%"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="公司名称">
+                    <el-input v-model="form.client_company" :disabled="true" style="width: 100%"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="项目上级">
+                    <el-input v-model="form.projectMonitorID" :disabled="true" style="width: 100%"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-form-item label="起止时间">
+                <el-col :span="11">
+                  <el-date-picker
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="form.startDate"
+                    style="width: 100%"
+                    :disabled="editMode"
+                  ></el-date-picker>
+                </el-col>
+                <el-col class="line" :span="2">-</el-col>
+                <el-col :span="11">
+                  <el-date-picker
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="form.endDate"
+                    style="width: 100%"
+                    :disabled="editMode"
+                  ></el-date-picker>
+                </el-col>
               </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label-width="0" :prop="'projectMilestones.' + index + '.time'">
-                <el-date-picker
-                  type="date"
-                  placeholder="选择日期"
-                  v-model="milestone.time"
-                  style="width: 100%"
-                ></el-date-picker>
-              </el-form-item>
-            </el-col>
-            <el-col :span="2">
-              <el-button type="text" v-show="index" @click.prevent="removeDomain(milestone)">删除</el-button>
-            </el-col>
-          </el-row>
-        </el-card>
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>功能列表</span>
-            <el-button
-              @click.prevent="createFunction"
-              style="float: right; padding: 3px 0"
-              type="text"
-            >新增功能</el-button>
-          </div>
-          <el-table
-            :data="form.functions"
-            border
-            style="width: 100%"
-            @cell-click="handleClickFunction"
-            row-key="id"
-            default-expand-all
-          >
-            <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" width="120" />
-            <el-table-column prop="name" label="标题" :show-overflow-tooltip="true" />
-            <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="100" />
-            <el-table-column fixed="right" label="操作" width="80">
-              <template slot-scope="scope">
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="开发语言">
+                    <el-select
+                      v-model="form.languages"
+                      multiple
+                      style="width: 100%"
+                      :disabled="editMode"
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="item in languagesList"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      ></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="开发框架">
+                    <el-input type="textarea" v-model="form.frameworks" :disabled="editMode"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-card class="box-card-right">
+              <div slot="header" class="clearfix">
+                <span>里程碑</span>
                 <el-button
-                  @click.native.prevent="deleteRow(scope.$index, form.functions)"
+                  @click.prevent="addDomain"
+                  style="float: right; padding: 0"
                   type="text"
-                  size="small"
-                >删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-col>
-    </el-form>
+                  v-show="!editMode"
+                >新增里程碑</el-button>
+              </div>
+              <el-row v-for="(milestone, index) in form.projectMilestones" :key="index">
+                <el-col :span="14">
+                  <el-form-item
+                    :label="'里程碑' + index"
+                    :prop="'projectMilestones.' + index + '.contents'"
+                  >
+                    <el-input type="textarea" v-model="milestone.contents" :disabled="editMode"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label-width="0" :prop="'projectMilestones.' + index + '.time'">
+                    <el-date-picker
+                      type="date"
+                      placeholder="选择日期"
+                      v-model="milestone.time"
+                      :disabled="editMode"
+                      style="width: 100%"
+                    ></el-date-picker>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="2">
+                  <el-button
+                    type="text"
+                    v-show="index && !editMode"
+                    @click.prevent="removeDomain(milestone)"
+                  >删除</el-button>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="功能列表">
+        <el-row class="dashboard-row">
+          <el-col :span="4">
+            <el-button type="primary" icon="el-icon-plus" @click="createFunction">新建功能</el-button>
+          </el-col>
+          <el-col :span="3" :offset="14">
+            <el-button type="primary" icon="el-icon-upload2" style="float:right">导入</el-button>
+          </el-col>
+          <el-col :span="3">
+            <el-button type="primary" icon="el-icon-download" style="float:right">导出</el-button>
+          </el-col>
+        </el-row>
+        <el-table
+          :data="form.functions"
+          border
+          style="width: 100%"
+          @cell-click="handleClickFunction"
+          row-key="id"
+          default-expand-all
+        >
+          <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" width="300" />
+          <el-table-column prop="name" label="标题" :show-overflow-tooltip="true" />
+          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />
+          <el-table-column fixed="right" label="操作" width="80">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="deleteRow(scope.$index, form.functions)"
+                type="text"
+                size="small"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="成员管理">
+        <el-row class="dashboard-row">
+          <el-col :span="4">
+            <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">新增成员</el-button>
+          </el-col>
+        </el-row>
+        <el-tabs type="card">
+          <el-tab-pane label="项目成员(0)"></el-tab-pane>
+          <el-tab-pane label="项目经理(0)"></el-tab-pane>
+          <el-tab-pane label="QA(0)"></el-tab-pane>
+          <el-tab-pane label="QALeader(0)"></el-tab-pane>
+          <el-tab-pane label="开发(0)"></el-tab-pane>
+          <el-tab-pane label="开发Leader(0)"></el-tab-pane>
+          <el-tab-pane label="EPG(0)"></el-tab-pane>
+        </el-tabs>
+        <el-table :data="form.userList" border style="width: 100%">
+          <el-table-column prop="userName" label="用户名" width="200" />
+          <el-table-column prop="userMail" label="邮箱"/>
+          <el-table-column prop="userType" label="角色" width="200" />
+          <el-table-column prop="userManage" label="项目上级" width="200" />
+          <el-table-column fixed="right" label="操作" width="140">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="deleteRow(scope.$index, form.userList)"
+                type="text"
+                size="small"
+              >删除</el-button>
+              <el-button type="text" size="small">编辑上级</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+    </el-tabs>
 
     <el-dialog title="新增成员" :visible.sync="addUserFromVisible">
       <el-form :model="addUserFrom" label-width="100px" label-position="center">
@@ -191,7 +230,7 @@
               filterable
               remote
               reserve-keyword
-              placeholder="请搜索项目上级"
+              placeholder="请搜索账号"
               :remote-method="remoteMethod"
               :loading="loading"
               style="width: 100%"
@@ -212,7 +251,7 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="addUserFrom = false">取消</el-button>
+        <el-button @click.native="addUserFromVisible = false">取消</el-button>
         <el-button type="primary" @click="addUserSubmit">提交</el-button>
       </div>
     </el-dialog>
@@ -367,7 +406,17 @@ export default {
           }
         ]
       },
-      languagesList: ["Java", "C", "C++"],
+      editMode: true,
+      languagesList: [
+        "Java",
+        "C",
+        "C++",
+        "JavaScript",
+        "Swift",
+        "Python",
+        "PHP",
+        "Go"
+      ],
       options: [],
       value: [],
       list: [],
@@ -429,7 +478,7 @@ export default {
         userName: null,
         userType: null
       },
-      userTypeList: ["EPG", "QA", "项目经理", "项目上级"],
+      userTypeList: ["QA", "QALeader", "开发", "开发Leader", "EPG"],
       newFunction: {
         title: "",
         project: "",
@@ -521,8 +570,16 @@ export default {
 </script>
 
 <style lang="scss">
-.box-card {
-  margin: 10px;
+.dashboard {
+  &-row {
+    margin-bottom: 10px;
+  }
+}
+.box-card-left {
+  margin: 10px 10px 10px 0;
+}
+.box-card-right {
+  margin: 10px 0 10px 10px;
 }
 </style>
 

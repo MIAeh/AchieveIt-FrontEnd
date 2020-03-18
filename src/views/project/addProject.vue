@@ -249,7 +249,7 @@ export default {
           }
         ]
       },
-      languagesList: ["Java", "C", "C++"],
+      languagesList: ["Java", "C", "C++", "JavaScript", "Swift", "Python", "PHP", "Go"],
       options: [],
       value: [],
       list: [],
