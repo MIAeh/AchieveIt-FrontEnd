@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
-    <el-tabs type="border-card">
-      <el-tab-pane label="基本信息">
+    <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabRoute">
+      <el-tab-pane label="基本信息" name="basicInfo">
         <el-row>
           <el-col :span="4">
             <el-button
@@ -153,178 +153,20 @@
           </el-col>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="功能列表">
-        <el-row class="dashboard-row">
-          <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="createFunction">新建功能</el-button>
-          </el-col>
-          <el-col :span="3" :offset="14">
-            <el-button type="primary" icon="el-icon-upload2" style="float:right">导入</el-button>
-          </el-col>
-          <el-col :span="3">
-            <el-button type="primary" icon="el-icon-download" style="float:right">导出</el-button>
-          </el-col>
-        </el-row>
-        <el-table
-          :data="form.functions"
-          border
-          style="width: 100%"
-          @cell-click="handleClickFunction"
-          row-key="id"
-          default-expand-all
-        >
-          <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" width="300" />
-          <el-table-column prop="name" label="标题" :show-overflow-tooltip="true" />
-          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />
-          <el-table-column fixed="right" label="操作" width="80">
-            <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="deleteRow(scope.$index, form.functions)"
-                type="text"
-                size="small"
-              >删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+      <el-tab-pane label="功能列表" name="functionList">
       </el-tab-pane>
-      <el-tab-pane label="成员管理">
-        <el-row class="dashboard-row">
-          <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">新增成员</el-button>
-          </el-col>
-        </el-row>
-        <el-tabs type="card">
-          <el-tab-pane label="项目成员(0)"></el-tab-pane>
-          <el-tab-pane label="项目经理(0)"></el-tab-pane>
-          <el-tab-pane label="QA(0)"></el-tab-pane>
-          <el-tab-pane label="QALeader(0)"></el-tab-pane>
-          <el-tab-pane label="开发(0)"></el-tab-pane>
-          <el-tab-pane label="开发Leader(0)"></el-tab-pane>
-          <el-tab-pane label="EPG(0)"></el-tab-pane>
-        </el-tabs>
-        <el-table :data="form.userList" border style="width: 100%">
-          <el-table-column prop="userName" label="用户名" width="200" />
-          <el-table-column prop="userMail" label="邮箱"/>
-          <el-table-column prop="userType" label="角色" width="200" />
-          <el-table-column prop="userManage" label="项目上级" width="200" />
-          <el-table-column fixed="right" label="操作" width="140">
-            <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="deleteRow(scope.$index, form.userList)"
-                type="text"
-                size="small"
-              >删除</el-button>
-              <el-button type="text" size="small">编辑上级</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+      <el-tab-pane label="成员管理" name="memberManage">
       </el-tab-pane>
     </el-tabs>
-
-    <el-dialog title="新增成员" :visible.sync="addUserFromVisible">
-      <el-form :model="addUserFrom" label-width="100px" label-position="center">
-        <el-row>
-          <el-form-item label="账号邀请">
-            <el-select
-              v-model="addUserFrom.userName"
-              filterable
-              remote
-              reserve-keyword
-              placeholder="请搜索账号"
-              :remote-method="remoteMethod"
-              :loading="loading"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="角色">
-            <el-select v-model="addUserFrom.userType" placeholder="请选择角色">
-              <el-option v-for="item in userTypeList" :key="item" :label="item" :value="item"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="addUserFromVisible = false">取消</el-button>
-        <el-button type="primary" @click="addUserSubmit">提交</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
-      <el-form :model="newFunction" label-position="top" :rules="newFunctionRules">
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="newFunction.title"></el-input>
-        </el-form-item>
-        <el-form-item label="所属项目">
-          <el-input v-model="newFunction.project" :disabled="true"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="功能类型">
-              <el-select v-model="newFunction.type">
-                <el-option v-for="item in functionTypeList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="一级父功能">
-              <el-select v-model="newFunction.firstFather">
-                <el-option v-for="item in firstFatherList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="二级父功能">
-              <el-select v-model="newFunction.secondFather">
-                <el-option v-for="item in secondFatherList" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="描述">
-          <el-input type="textarea" v-model="newFunction.description"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="createFunctionDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog title="功能信息" :visible.sync="functionInfoDialogVisible">
-      <el-form :model="functionInfo">
-        <el-form-item label="ID">
-          <el-input v-model="functionInfo.id" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="标题">
-          <el-input v-model="functionInfo.title"></el-input>
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-input v-model="functionInfo.createTime" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input type="textarea" v-model="functionInfo.description"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="functionInfoDialogVisible = false">保 存</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
-  name: "AddProject",
+  name: "BasicInfo",
   data() {
     return {
+      activeTabName: 'basicInfo',
       form: {
         projectID: "",
         projectName: "",
@@ -472,36 +314,7 @@ export default {
         "West Virginia",
         "Wisconsin",
         "Wyoming"
-      ],
-      addUserFromVisible: false,
-      addUserFrom: {
-        userName: null,
-        userType: null
-      },
-      userTypeList: ["QA", "QALeader", "开发", "开发Leader", "EPG"],
-      newFunction: {
-        title: "",
-        project: "",
-        type: "",
-        firstFather: "",
-        secondFather: "",
-        description: ""
-      },
-      newFunctionRules: {
-        title: [{ required: true, message: "请输入标题" }]
-      },
-      functionInfo: {
-        id: "54321-0001",
-        title: "一级功能1",
-        project: "54321",
-        createTime: "2020-03-14",
-        description: "一级功能1的描述"
-      },
-      functionTypeList: ["一级功能", "二级功能", "三级功能"],
-      firstFatherList: ["一级功能1", "一级功能2", "一级功能3"],
-      secondFatherList: ["二级功能1-1", "二级功能1-2"],
-      createFunctionDialogVisible: false,
-      functionInfoDialogVisible: false
+      ]
     };
   },
   mounted() {
@@ -512,7 +325,10 @@ export default {
   methods: {
     onSubmit() {
       console.log("submit!");
-      this.$router.push("/project");
+      this.$router.push("/projectList");
+    },
+    handleTabRoute(tab, event) {
+      this.$router.push(`/projectInfo/${tab.name}`)
     },
     handleProjectID(val) {
       this.form.clinet_id = (Math.random() * 1000).toFixed();
@@ -544,26 +360,6 @@ export default {
       } else {
         this.options = [];
       }
-    },
-    handleAddUser() {
-      this.addUserFromVisible = true;
-      this.addUserFrom = {};
-    },
-    addUserSubmit() {
-      this.addUserFromVisible = false;
-    },
-    handleClickFunction(row, column, event, cell) {
-      console.log(row);
-      console.log(column);
-      console.log(event);
-      console.log(cell);
-      if (column.label === "ID") this.functionInfoDialogVisible = true;
-    },
-    createFunction() {
-      this.createFunctionDialogVisible = true;
-    },
-    deleteRow(index, rows) {
-      rows.splice(index, 1);
     }
   }
 };

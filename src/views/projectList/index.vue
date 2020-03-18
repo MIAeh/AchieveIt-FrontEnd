@@ -63,7 +63,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Project',
+  name: 'ProjectList',
   data() {
     return {
       listQuery: {
@@ -137,7 +137,7 @@ export default {
       this.$router.push('/project/addProject')
     },
     handleClickProject() {
-      this.$router.push('/project/projectInfo')
+      this.$router.push('/projectInfo/basicInfo')
     }
   }
 }
