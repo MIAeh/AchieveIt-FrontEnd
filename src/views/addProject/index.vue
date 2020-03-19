@@ -357,7 +357,7 @@ export default {
   methods: {
     onSubmit() {
       console.log("submit!");
-      this.$router.push("/project");
+      this.$router.push("/projectList");
     },
     handleProjectID(val) {
       this.form.clinet_id = (Math.random() * 1000).toFixed();
