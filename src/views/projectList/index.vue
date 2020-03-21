@@ -23,32 +23,32 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="未开始" name="未开始">
-        <el-table :data="startProject" border style="width: 100%">
+        <el-table :data="startProject" border style="width: 100%" @row-click="handleClickProject">
           <el-table-column prop="projectName" label="项目名称" width="180" />
           <el-table-column prop="projectStatus" label="项目状态" width="120" />
-          <el-table-column prop="projectManagerName" label="项目上级" width="120" />
+<!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
           <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
           <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="进行中" name="进行中">
+      <el-tab-pane label="进行中" name="进行中" @row-click="handleClickProject">
         <el-table :data="underwayProject" border style="width: 100%">
           <el-table-column prop="projectName" label="项目名称" width="180" />
           <el-table-column prop="projectStatus" label="项目状态" width="120" />
-          <el-table-column prop="projectManagerName" label="项目上级" width="120" />
+<!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
           <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
           <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="已完成" name="已完成">
+      <el-tab-pane label="已完成" name="已完成" @row-click="handleClickProject">
         <el-table :data="finishedProject" border style="width: 100%">
           <el-table-column prop="projectName" label="项目名称" width="180" />
           <el-table-column prop="projectStatus" label="项目状态" width="120" />
-          <el-table-column prop="projectManagerName" label="项目上级" width="120" />
+<!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
           <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
           <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
@@ -74,30 +74,16 @@ export default {
         searchCondition: ""
       },
       allProject: [
-        // {
-        //   projectName: 'AchieveIt',
-        //   projectStatus: '进行中',
-        //   projectManagerName: '小六',
-        //   projectStartDate: '2020-10-10',
-        //   projectEndDate: '2020-10-10',
-        //   projectClientContactName: '5%'
-        // },
-        // {
-        //   projectName: 'Myproject',
-        //   projectStatus: '未开始',
-        //   projectManagerName: '小六',
-        //   projectStartDate: '2020-10-10',
-        //   projectEndDate: '2020-10-10',
-        //   projectClientContactName: '0%'
-        // },
-        // {
-        //   projectName: 'test',
-        //   projectStatus: '已完成',
-        //   projectManagerName: '小六',
-        //   projectStartDate: '2020-10-10',
-        //   projectEndDate: '2020-10-10',
-        //   projectClientContactName: '100%'
-        // }
+        {
+          projectID: "2019-0000-D-01",
+          projectName: "test project updated 1",
+          projectStatus: 0,
+          projectManagerName: "boss",
+          projectMonitorName: "tester",
+          projectClientContactName: "billy",
+          projectStartDate: "2019-11-11 00:00:00",
+          projectEndDate: "2021-11-11 00:00:00"
+        }
       ],
       underwayProject: [
         // {
@@ -131,86 +117,67 @@ export default {
       ]
     }
   },
-  mounted: function() {
-    this.getAllProject()
+  created: function() {
+    this.getAllProject();
   },
   computed: {
     ...mapGetters(['name'])
   },
   methods: {
-    handleTabsClick(tab, event) {
-      this.listQuery.searchCondition = ""
+    handleTabsClick(tab) {
+      this.listQuery.searchCondition = "";
       switch (tab.label) {
         case "全部项目":
-          this.getAllProject()
-          break
+          this.getAllProject();
+          break;
         case "未开始":
-          this.getStartProject()
-          break
+          this.getStartProject();
+          break;
         case "进行中":
-          this.getUnderwayProject()
-          break
+          this.getUnderwayProject();
+          break;
         case "已完成":
-          this.getFinishedProject()
-          break
+          this.getFinishedProject();
+          break;
       }
     },
     getAllProject() {
-      const params = {
-        searchCondition: "",
-        projectStatus: -1
-      }
-      getProjectList(params).then(response => {
-        const { data } = response
-        this.allProject = data
-      })
+      // getProjectList("", -1).then(response => {
+      //   const { data } = response
+      //   this.allProject = data
+      // })
     },
     getStartProject() {
-      const params = {
-        searchCondition: "",
-        projectStatus: 0
-      }
-      getProjectList(params).then(response => {
-        const { data } = response
-        this.startProject = data
+      getProjectList("", 0).then(response => {
+        const { data } = response;
+        this.startProject = data;
       })
     },
     getUnderwayProject() {
-      const params = {
-        searchCondition: "",
-        projectStatus: 1
-      }
-      getProjectList(params).then(response => {
-        const { data } = response
-        this.underwayProject = data
+      getProjectList("", 1).then(response => {
+        const { data } = response;
+        this.underwayProject = data;
       })
     },
     getFinishedProject() {
-      const params = {
-        searchCondition: "",
-        projectStatus: 2
-      }
-      getProjectList(params).then(response => {
-        const { data } = response
-        this.finishedProject = data
+      getProjectList("", 2).then(response => {
+        const { data } = response;
+        this.finishedProject = data;
       })
     },
     handleAddProject() {
       this.$router.push('/project/addProject')
     },
     searchProject() {
-      const params = {
-        searchCondition: this.listQuery.searchCondition,
-        projectStatus: -1
-      }
-      getProjectList(params).then(response => {
-        const { data } = response
-        this.allProject = data
-        this.currentTabName = "全部项目"
+      getProjectList(this.listQuery.searchCondition, -1).then(response => {
+        const { data } = response;
+        this.allProject = data;
+        this.currentTabName = "全部项目";
       })
     },
-    handleClickProject() {
-      this.$router.push('/projectInfo/basicInfo')
+    handleClickProject(row) {
+      this.$store.commit("project/setCurrentProjectId", { currentProjectId: row.projectID });
+      this.$router.push({path: "/projectInfo/basicInfo"});
     }
   }
 }

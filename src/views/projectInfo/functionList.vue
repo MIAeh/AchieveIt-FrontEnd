@@ -19,12 +19,13 @@
           border
           style="width: 100%"
           @cell-click="handleClickFunction"
-          row-key="id"
+          row-key="featureId"
           default-expand-all
+          :tree-props="{children: 'allChildren'}"
         >
-          <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" width="300" />
-          <el-table-column prop="name" label="标题" :show-overflow-tooltip="true" />
-          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />
+          <el-table-column prop="featureId" label="ID" :show-overflow-tooltip="true" width="300" />
+          <el-table-column prop="featureName" label="标题" :show-overflow-tooltip="true" />
+<!--          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />-->
           <el-table-column fixed="right" label="操作" width="80">
             <template slot-scope="scope">
               <el-button
@@ -104,6 +105,8 @@
 </template>
 
 <script>
+import {getFeature} from "@/api/feature";
+
 export default {
   name: "AddProject",
   data() {
@@ -111,23 +114,23 @@ export default {
       activeTabName: "functionList",
       functions: [
         {
-          id: "54321-0001",
-          name: "一级功能1",
+          featureId: "54321-0001",
+          featureName: "一级功能1",
           project: "54321",
-          children: [
+          allChildren: [
             {
-              id: "54321-0001-001",
-              name: "二级功能1-1",
+              featureId: "54321-0001-001",
+              featureName: "二级功能1-1",
               project: "54321"
             },
             {
-              id: "54321-0001-002",
-              name: "二级功能1-2",
+              featureId: "54321-0001-002",
+              featureName: "二级功能1-2",
               project: "54321",
-              children: [
+              allChildren: [
                 {
-                  id: "54321-0001-002-001",
-                  name: "二级功能1-2-1",
+                  featureId: "54321-0001-002-001",
+                  featureName: "二级功能1-2-1",
                   project: "54321"
                 }
               ]
@@ -135,13 +138,13 @@ export default {
           ]
         },
         {
-          id: "54321-0002",
-          name: "一级功能2",
+          featureId: "54321-0002",
+          featureName: "一级功能2",
           project: "54321"
         },
         {
-          id: "54321-0003",
-          name: "一级功能3",
+          featureId: "54321-0003",
+          featureName: "一级功能3",
           project: "54321"
         }
       ],
@@ -170,7 +173,16 @@ export default {
       functionInfoDialogVisible: false
     };
   },
+  created() {
+    this.getFeature();
+  },
   methods: {
+    getFeature() {
+      getFeature(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        this.functions = data;
+      })
+    },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },

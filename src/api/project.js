@@ -1,24 +1,38 @@
 import request from '@/utils/request'
 
-export function getProjectList(data) {
+export function getProjectList(searchCondition, projectStatus) {
   return request({
     url: 'project/getProjectList',
     method: 'get',
-    params: data
+    params: {
+      searchCondition: searchCondition,
+      projectStatus: projectStatus
+    }
   })
 }
 
-export function getInfo(token) {
+export function getProjectIDList() {
   return request({
-    url: '/vue-admin-template/user/info',
+    url: 'project/getProjectIDList',
+    method: 'get'
+  })
+}
+
+export function getProjectInfo(projectID) {
+  return request({
+    url: 'project/getProjectByID',
     method: 'get',
-    params: { token }
+    params: {
+      projectID: projectID
+    }
   })
 }
 
-export function logout() {
+export function updateProjectInfo(projectInfo) {
   return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
+    url: 'project/updateProjectByID',
+    method: 'post',
+    data: projectInfo
   })
 }
+

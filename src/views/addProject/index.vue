@@ -16,16 +16,15 @@
                   remote
                   reserve-keyword
                   placeholder="请搜索项目ID"
-                  :remote-method="remoteMethod"
                   :loading="loading"
-                  @change="handleProjectID"
+                  @change="handleProjectIdChange"
                   style="width: 100%"
                 >
                   <el-option
                     v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.label"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -39,7 +38,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="客户ID">
-                <el-input v-model="form.clinet_id" :readonly="true"></el-input>
+                <el-input v-model="form.client_id" :readonly="true"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -164,6 +163,9 @@
 </template>
 
 <script>
+  import {getProjectIDList} from "@/api/project";
+  import {getClientInfo} from "@/api/client";
+
 export default {
   name: "AddProject",
   data() {
@@ -171,7 +173,7 @@ export default {
       form: {
         projectID: "",
         projectName: "",
-        clinet_id: "",
+        client_id: "",
         client_contact_name: "",
         client_company: "",
         startDate: "",
@@ -349,21 +351,38 @@ export default {
       }
     };
   },
+  created: function() {
+    this.getProjectId()
+  },
   mounted() {
     this.list = this.states.map(item => {
       return { value: `value:${item}`, label: `label:${item}` };
     });
   },
   methods: {
+    getProjectId() {
+      getProjectIDList().then(response => {
+        const { data } = response
+        this.options = data
+      })
+    },
     onSubmit() {
       console.log("submit!");
       this.$router.push("/projectList");
     },
-    handleProjectID(val) {
-      this.form.clinet_id = (Math.random() * 1000).toFixed();
-      const data = val.split(":");
-      this.form.client_contact_name = data[0];
-      this.form.client_company = data[1];
+    handleProjectIdChange(projectID) {
+      // this.form.clinet_id = (Math.random() * 1000).toFixed();
+      // const data = val.split(":");
+      // this.form.client_contact_name = data[0];
+      // this.form.client_company = data[1];
+      const clientId = projectID.split("-")[1]
+      getClientInfo(clientId).then(response => {
+        const { data } = response
+        const { clientID,  clientCompany, clientContactName } = data
+        this.form.client_id = clientID
+        this.form.client_company = clientCompany
+        this.form.client_contact_name = clientContactName
+      })
     },
     removeDomain(item) {
       let index = this.form.projectMilestones.indexOf(item);
