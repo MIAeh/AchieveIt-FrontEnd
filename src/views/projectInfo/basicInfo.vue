@@ -13,7 +13,7 @@
             <el-button type="primary" icon="el-icon-view" @click="editMode = false" v-else>浏览模式</el-button>
           </el-col>
           <el-col :span="4" :offset="16">
-            <el-button type="primary" @click="onSubmit" style="float:right" v-show="!editMode">保存</el-button>
+            <el-button type="primary" @click="updateProjectInfo" style="float:right" v-show="!editMode">保存</el-button>
           </el-col>
         </el-row>
         <el-form ref="form" :model="form" label-width="80px">
@@ -37,13 +37,13 @@
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="客户ID">
-                    <el-input v-model="form.client_id" :disabled="true" style="width: 100%"></el-input>
+                    <el-input v-model="form.projectClientID" :disabled="true" style="width: 100%"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="接口人">
                     <el-input
-                      v-model="form.client_contact_name"
+                      v-model="form.projectClientContactName"
                       :disabled="true"
                       style="width: 100%"
                     ></el-input>
@@ -53,7 +53,7 @@
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="公司名称">
-                    <el-input v-model="form.client_company" :disabled="true" style="width: 100%"></el-input>
+                    <el-input v-model="form.projectClientCompany" :disabled="true" style="width: 100%"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
@@ -67,7 +67,7 @@
                   <el-date-picker
                     type="date"
                     placeholder="选择日期"
-                    v-model="form.startDate"
+                    v-model="form.projectStartDate"
                     style="width: 100%"
                     :disabled="editMode"
                   ></el-date-picker>
@@ -77,7 +77,7 @@
                   <el-date-picker
                     type="date"
                     placeholder="选择日期"
-                    v-model="form.endDate"
+                    v-model="form.projectEndDate"
                     style="width: 100%"
                     :disabled="editMode"
                   ></el-date-picker>
@@ -87,7 +87,7 @@
                 <el-col :span="12">
                   <el-form-item label="开发语言">
                     <el-select
-                      v-model="form.languages"
+                      v-model="form.projectLanguages"
                       multiple
                       style="width: 100%"
                       :disabled="editMode"
@@ -104,7 +104,7 @@
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="开发框架">
-                    <el-input type="textarea" v-model="form.frameworks" :disabled="editMode"></el-input>
+                    <el-input type="textarea" v-model="form.projectFrameworks" :disabled="editMode"></el-input>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -127,7 +127,7 @@
                     :label="'里程碑' + index"
                     :prop="'projectMilestones.' + index + '.contents'"
                   >
-                    <el-input type="textarea" v-model="milestone.contents" :disabled="editMode"></el-input>
+                    <el-input type="textarea" v-model="milestone.milestoneContent" :disabled="editMode"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -135,7 +135,7 @@
                     <el-date-picker
                       type="date"
                       placeholder="选择日期"
-                      v-model="milestone.time"
+                      v-model="milestone.milestoneDate"
                       :disabled="editMode"
                       style="width: 100%"
                     ></el-date-picker>
@@ -162,6 +162,8 @@
 </template>
 
 <script>
+  import {getProjectInfo, updateProjectInfo} from "@/api/project";
+
 export default {
   name: "BasicInfo",
   data() {
@@ -170,83 +172,21 @@ export default {
       form: {
         projectID: "",
         projectName: "",
-        clinet_id: "",
-        client_contact_name: "",
-        client_company: "",
-        startDate: "",
-        endDate: "",
+        projectClientID: "",
+        projectClientContactName: "",
+        projectClientCompany: "",
+        projectStartDate: "",
+        projectEndDate: "",
         projectMonitorID: "",
         projectManagerID: "",
         projectMilestones: [
           {
-            time: "",
-            contents: ""
+            milestoneDate: "",
+            milestoneContent: ""
           }
         ],
-        languages: [],
-        frameworks: "",
-        functions: [
-          {
-            id: "54321-0001",
-            name: "一级功能1",
-            project: "54321",
-            children: [
-              {
-                id: "54321-0001-001",
-                name: "二级功能1-1",
-                project: "54321"
-              },
-              {
-                id: "54321-0001-002",
-                name: "二级功能1-2",
-                project: "54321",
-                children: [
-                  {
-                    id: "54321-0001-002-001",
-                    name: "二级功能1-2-1",
-                    project: "54321"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: "54321-0002",
-            name: "一级功能2",
-            project: "54321"
-          },
-          {
-            id: "54321-0003",
-            name: "一级功能3",
-            project: "54321"
-          }
-        ],
-        userList: [
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          }
-        ]
+        projectLanguages: [],
+        projectFrameworks: "",
       },
       editMode: true,
       languagesList: [
@@ -317,24 +257,31 @@ export default {
       ]
     };
   },
+  created() {
+    this.getProjectInfo();
+  },
   mounted() {
     this.list = this.states.map(item => {
       return { value: `value:${item}`, label: `label:${item}` };
     });
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
-      this.$router.push("/projectList");
+    getProjectInfo() {
+      this.form.projectID = this.$store.state.project.currentProjectId;
+      getProjectInfo(this.form.projectID).then(response => {
+        const { data } = response;
+        this.form = data;
+        console.log(data)
+      })
+    },
+    updateProjectInfo() {
+      console.log(this.form);
+      updateProjectInfo(this.form).then( (response) => {
+        this.$router.push("/projectList");
+      })
     },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`)
-    },
-    handleProjectID(val) {
-      this.form.clinet_id = (Math.random() * 1000).toFixed();
-      const data = val.split(":");
-      this.form.client_contact_name = data[0];
-      this.form.client_company = data[1];
     },
     removeDomain(item) {
       let index = this.form.projectMilestones.indexOf(item);
