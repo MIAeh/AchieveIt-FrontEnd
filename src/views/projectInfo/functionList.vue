@@ -25,7 +25,7 @@
         >
           <el-table-column prop="featureId" label="ID" :show-overflow-tooltip="true" width="300" />
           <el-table-column prop="featureName" label="标题" :show-overflow-tooltip="true" />
-<!--          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />-->
+          <!--          <el-table-column prop="project" label="所属项目" :show-overflow-tooltip="true" width="150" />-->
           <el-table-column fixed="right" label="操作" width="80">
             <template slot-scope="scope">
               <el-button
@@ -38,6 +38,8 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="成员管理" name="memberManage"></el-tab-pane>
+      <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
+      <el-tab-pane label="工时管理" name="workHour"></el-tab-pane>
     </el-tabs>
 
     <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
@@ -105,7 +107,7 @@
 </template>
 
 <script>
-import {getFeature} from "@/api/feature";
+import { getFeature } from "@/api/feature";
 
 export default {
   name: "AddProject",
@@ -181,7 +183,7 @@ export default {
       getFeature(this.$store.state.project.currentProjectId).then(res => {
         const { data } = res;
         this.functions = data;
-      })
+      });
     },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);

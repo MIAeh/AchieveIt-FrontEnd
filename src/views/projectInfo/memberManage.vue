@@ -35,6 +35,8 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
+      <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
+      <el-tab-pane label="工时管理" name="workHour"></el-tab-pane>
     </el-tabs>
 
     <el-dialog title="新增成员" :visible.sync="addUserFromVisible">

@@ -79,6 +79,18 @@ export const constantRoutes = [
             component: () => import("@/views/projectInfo/memberManage"),
             name: "MemberManage",
             meta: { title: "成员管理" }
+          },
+          {
+            path: "authorityManage",
+            component: () => import("@/views/projectInfo/authorityManage"),
+            name: "AuthorityManage",
+            meta: { title: "权限管理" }
+          },
+          {
+            path: "workHour",
+            component: () => import("@/views/projectInfo/workHour"),
+            name: "WorkHour",
+            meta: { title: "工时管理" }
           }
         ]
       }

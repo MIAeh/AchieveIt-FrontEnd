@@ -13,7 +13,12 @@
             <el-button type="primary" icon="el-icon-view" @click="editMode = false" v-else>浏览模式</el-button>
           </el-col>
           <el-col :span="4" :offset="16">
-            <el-button type="primary" @click="updateProjectInfo" style="float:right" v-show="!editMode">保存</el-button>
+            <el-button
+              type="primary"
+              @click="updateProjectInfo"
+              style="float:right"
+              v-show="!editMode"
+            >保存</el-button>
           </el-col>
         </el-row>
         <el-form ref="form" :model="form" label-width="80px">
@@ -53,7 +58,11 @@
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="公司名称">
-                    <el-input v-model="form.projectClientCompany" :disabled="true" style="width: 100%"></el-input>
+                    <el-input
+                      v-model="form.projectClientCompany"
+                      :disabled="true"
+                      style="width: 100%"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
@@ -127,7 +136,11 @@
                     :label="'里程碑' + index"
                     :prop="'projectMilestones.' + index + '.contents'"
                   >
-                    <el-input type="textarea" v-model="milestone.milestoneContent" :disabled="editMode"></el-input>
+                    <el-input
+                      type="textarea"
+                      v-model="milestone.milestoneContent"
+                      :disabled="editMode"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -153,22 +166,22 @@
           </el-col>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="功能列表" name="functionList">
-      </el-tab-pane>
-      <el-tab-pane label="成员管理" name="memberManage">
-      </el-tab-pane>
+      <el-tab-pane label="功能列表" name="functionList"></el-tab-pane>
+      <el-tab-pane label="成员管理" name="memberManage"></el-tab-pane>
+      <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
+      <el-tab-pane label="工时管理" name="workHour"></el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script>
-  import {getProjectInfo, updateProjectInfo} from "@/api/project";
+import { getProjectInfo, updateProjectInfo } from "@/api/project";
 
 export default {
   name: "BasicInfo",
   data() {
     return {
-      activeTabName: 'basicInfo',
+      activeTabName: "basicInfo",
       form: {
         projectID: "",
         projectName: "",
@@ -186,7 +199,7 @@ export default {
           }
         ],
         projectLanguages: [],
-        projectFrameworks: "",
+        projectFrameworks: ""
       },
       editMode: true,
       languagesList: [
@@ -271,17 +284,17 @@ export default {
       getProjectInfo(this.form.projectID).then(response => {
         const { data } = response;
         this.form = data;
-        console.log(data)
-      })
+        console.log(data);
+      });
     },
     updateProjectInfo() {
       console.log(this.form);
-      updateProjectInfo(this.form).then( (response) => {
+      updateProjectInfo(this.form).then(response => {
         this.$router.push("/projectList");
-      })
+      });
     },
     handleTabRoute(tab, event) {
-      this.$router.push(`/projectInfo/${tab.name}`)
+      this.$router.push(`/projectInfo/${tab.name}`);
     },
     removeDomain(item) {
       let index = this.form.projectMilestones.indexOf(item);
