@@ -177,6 +177,9 @@ export default {
 .btn-text-red:hover {
   color: #f78989;
 }
+.el-collapse-item__header {
+  font-size: 20px;
+}
 </style>
 
 <style lang="scss" scoped>

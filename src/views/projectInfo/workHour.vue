@@ -50,36 +50,36 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="申报日期">
-              <el-input v-model="workHourForm.date"></el-input>
+              <el-input v-model="workHourForm.date" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="申报人">
-              <el-input v-model="workHourForm.person"></el-input>
+              <el-input v-model="workHourForm.person" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="审批人">
-              <el-input v-model="workHourForm.anotherPerson"></el-input>
+              <el-input v-model="workHourForm.anotherPerson" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="功能名称">
+            <el-form-item label="功能名称" prop="function">
               <el-cascader
                 v-model="workHourForm.function"
                 :options="functionList"
                 :show-all-levels="false"
-                :props="{ expandTrigger: 'hover', value: 'featureId', label: 'featureName', children: 'allChildren' }"
+                :props="{ expandTrigger: 'hover', checkStrictly: true, value: 'featureId', label: 'featureName', children: 'allChildren' }"
                 placeholder="请选择"
               ></el-cascader>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="活动名称">
+            <el-form-item label="活动名称" prop="activity">
               <el-cascader
                 v-model="workHourForm.activity"
                 :options="activityList"
@@ -90,7 +90,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="起始时间">
+        <el-form-item label="起始时间" prop="dateTime">
           <el-date-picker
             v-model="workHourForm.dateTime"
             type="datetimerange"
@@ -135,6 +135,7 @@ export default {
           status: "待批准"
         }
       ],
+      newApply: false,
       workHourFormVisible: false,
       workHourForm: {
         date: "2020-03-20",
@@ -228,6 +229,8 @@ export default {
   },
   created() {
     this.getFeature();
+    // const today = new Date();
+    // this.workHourForm.date
   },
   methods: {
     getFeature() {
