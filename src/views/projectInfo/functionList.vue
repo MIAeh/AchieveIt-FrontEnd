@@ -5,7 +5,7 @@
       <el-tab-pane label="功能列表" name="functionList">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="createFunction">新建功能</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="showCreateFunctionDialog">新建功能</el-button>
           </el-col>
           <el-col :span="3" :offset="14">
             <el-button type="primary" icon="el-icon-upload2" style="float:right">导入</el-button>
@@ -29,7 +29,7 @@
           <el-table-column fixed="right" label="操作" width="80">
             <template slot-scope="scope">
               <el-button
-                @click.native.prevent="deleteRow(scope.$index, functions)"
+                @click.native.prevent="deleteFeature(scope.row)"
                 type="text"
                 size="small"
               >删除</el-button>
@@ -44,70 +44,70 @@
 
     <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
       <el-form :model="newFunction" label-position="top" :rules="newFunctionRules">
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="newFunction.title"></el-input>
+        <el-form-item label="标题" prop="featureName">
+          <el-input v-model="newFunction.featureName"></el-input>
         </el-form-item>
         <el-form-item label="所属项目">
-          <el-input v-model="newFunction.project" :disabled="true"></el-input>
+          <el-input v-model="newFunction.projectId" :disabled="true"></el-input>
         </el-form-item>
         <el-row>
           <el-col :span="8">
             <el-form-item label="功能类型">
-              <el-select v-model="newFunction.type">
-                <el-option v-for="item in functionTypeList" :key="item" :label="item" :value="item"></el-option>
+              <el-select v-model="newFunction.featureLevel" @change="handleFeatureLevelChange">
+                <el-option v-for="item in functionTypeList" :key="item.label" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="一级父功能">
-              <el-select v-model="newFunction.firstFather">
-                <el-option v-for="item in firstFatherList" :key="item" :label="item" :value="item"></el-option>
+              <el-select :disabled="firstFatherDisabled" v-model="newFunction.firstFather">
+                <el-option v-for="item in firstFatherList" :key="item.featureId" :label="item.featureName" :value="item.featureId"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="二级父功能">
-              <el-select v-model="newFunction.secondFather">
-                <el-option v-for="item in secondFatherList" :key="item" :label="item" :value="item"></el-option>
+              <el-select :disabled="secondFatherDisabled" v-model="newFunction.secondFather">
+                <el-option v-for="item in secondFatherList" :key="item.featureId" :label="item.featureName" :value="item.featureId"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="描述">
-          <el-input type="textarea" v-model="newFunction.description"></el-input>
+          <el-input type="textarea" v-model="newFunction.featureDescription"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer">
         <el-button @click="createFunctionDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
+        <el-button type="primary" @click="createFeature">保 存</el-button>
       </span>
     </el-dialog>
 
     <el-dialog title="功能信息" :visible.sync="functionInfoDialogVisible">
       <el-form :model="functionInfo">
         <el-form-item label="ID">
-          <el-input v-model="functionInfo.id" :disabled="true"></el-input>
+          <el-input v-model="functionInfo.featureId" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="标题">
-          <el-input v-model="functionInfo.title"></el-input>
+          <el-input v-model="functionInfo.featureName"></el-input>
         </el-form-item>
         <el-form-item label="创建时间">
           <el-input v-model="functionInfo.createTime" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="描述">
-          <el-input type="textarea" v-model="functionInfo.description"></el-input>
+          <el-input type="textarea" v-model="functionInfo.featureDescription"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer">
         <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="functionInfoDialogVisible = false">保 存</el-button>
+        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getFeature } from "@/api/feature";
+  import {createFeature, deleteFeature, getFeature} from "@/api/feature";
 
 export default {
   name: "AddProject",
@@ -118,22 +118,25 @@ export default {
         {
           featureId: "54321-0001",
           featureName: "一级功能1",
-          project: "54321",
+          projectId: "54321",
+          featureDescription: "",
           allChildren: [
             {
               featureId: "54321-0001-001",
               featureName: "二级功能1-1",
-              project: "54321"
+              projectId: "54321",
+              featureDescription: ""
             },
             {
               featureId: "54321-0001-002",
               featureName: "二级功能1-2",
-              project: "54321",
+              projectId: "54321",
+              featureDescription: "",
               allChildren: [
                 {
                   featureId: "54321-0001-002-001",
                   featureName: "二级功能1-2-1",
-                  project: "54321"
+                  projectId: "54321"
                 }
               ]
             }
@@ -142,38 +145,71 @@ export default {
         {
           featureId: "54321-0002",
           featureName: "一级功能2",
-          project: "54321"
+          projectId: "54321",
+          featureDescription: ""
         },
         {
           featureId: "54321-0003",
           featureName: "一级功能3",
-          project: "54321"
+          projectId: "54321",
+          featureDescription: ""
         }
       ],
       newFunction: {
-        title: "",
-        project: "",
-        type: "",
+        featureName: "",
+        projectId: "",
+        featureLevel: 0,
         firstFather: "",
         secondFather: "",
-        description: ""
+        featureDescription: ""
       },
       newFunctionRules: {
-        title: [{ required: true, message: "请输入标题" }]
+        featureName: [{ required: true, message: "请输入标题" }]
       },
       functionInfo: {
-        id: "54321-0001",
-        title: "一级功能1",
-        project: "54321",
+        featureId: "54321-0001",
+        featureName: "一级功能1",
+        projectId: "54321",
         createTime: "2020-03-14",
-        description: "一级功能1的描述"
+        featureDescription: "一级功能1的描述"
       },
-      functionTypeList: ["一级功能", "二级功能", "三级功能"],
-      firstFatherList: ["一级功能1", "一级功能2", "一级功能3"],
-      secondFatherList: ["二级功能1-1", "二级功能1-2"],
+      functionTypeList: [
+        {
+          label: "一级功能",
+          value: 0
+        },
+        {
+          label: "二级功能",
+          value: 1
+        },
+        {
+          label: "三级功能",
+          value: 2
+        }
+      ],
       createFunctionDialogVisible: false,
       functionInfoDialogVisible: false
     };
+  },
+  computed: {
+    firstFatherDisabled() {
+      return this.newFunction.featureLevel === 0;
+    },
+    secondFatherDisabled() {
+      return this.newFunction.featureLevel === 0 || this.newFunction.featureLevel === 1;
+    },
+    firstFatherList() {
+      return this.functions;
+    },
+    secondFatherList() {
+      if (this.functions !== null && this.functions !== undefined) {
+        for (let i = 0; i < this.functions.length; i++) {
+          if (this.functions[i].featureId === this.newFunction.firstFather) {
+            return this.functions[i].allChildren;
+          }
+        }
+      }
+    }
   },
   created() {
     this.getFeature();
@@ -185,18 +221,46 @@ export default {
         this.functions = data;
       });
     },
-    handleTabRoute(tab, event) {
+    handleTabRoute(tab) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
-    handleClickFunction(row, column, event, cell) {
-      if (column.label === "ID") this.functionInfoDialogVisible = true;
+    handleClickFunction(row, column) {
+      this.functionInfo = row;
+      if (column.label !== "操作") this.functionInfoDialogVisible = true;
     },
-    createFunction() {
+    showCreateFunctionDialog() {
+      this.newFunction = {
+        featureName: "",
+        projectId: this.$store.state.project.currentProjectId,
+        featureLevel: 0,
+        firstFather: "",
+        secondFather: "",
+        description: ""
+      };
       this.createFunctionDialogVisible = true;
     },
-    deleteRow(index, rows) {
-      rows.splice(index, 1);
-    }
+    createFeature() {
+      createFeature(this.newFunction).then(res => {
+        this.createFunctionDialogVisible = false;
+        this.getFeature();
+      })
+    },
+    deleteFeature(row) {
+      deleteFeature(row.featureId).then(res => {
+        this.getFeature();
+      })
+    },
+    updateFeature() {
+
+    },
+    handleFeatureLevelChange(value) {
+      if (value === 0) {
+        this.newFunction.firstFather = "";
+        this.newFunction.secondFather = "";
+      } else if (value === 1) {
+        this.newFunction.secondFather = "";
+      }
+    },
   }
 };
 </script>
