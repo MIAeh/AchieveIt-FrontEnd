@@ -284,7 +284,6 @@ export default {
       getProjectInfo(this.form.projectID).then(response => {
         const { data } = response;
         this.form = data;
-        console.log(data);
       });
     },
     updateProjectInfo() {

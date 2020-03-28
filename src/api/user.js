@@ -16,6 +16,13 @@ export function getInfo(token) {
   })
 }
 
+export function getAllUser() {
+  return request({
+    url: 'user/getAllUserInfo',
+    method: 'get'
+  })
+}
+
 export function logout() {
   return request({
     url: '/vue-admin-template/user/logout',

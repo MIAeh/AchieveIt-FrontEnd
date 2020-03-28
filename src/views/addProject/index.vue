@@ -21,7 +21,7 @@
                   style="width: 100%"
                 >
                   <el-option
-                    v-for="item in options"
+                    v-for="item in allProjectID"
                     :key="item"
                     :label="item"
                     :value="item"
@@ -38,7 +38,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="客户ID">
-                <el-input v-model="form.client_id" :readonly="true"></el-input>
+                <el-input v-model="form.projectClientID" :readonly="true"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -61,56 +61,55 @@
                   remote
                   reserve-keyword
                   placeholder="请搜索项目上级"
-                  :remote-method="remoteMethod"
                   :loading="loading"
                   style="width: 100%"
                 >
                   <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in allUsers"
+                    :key="item.userId"
+                    :label="item.userId"
+                    :value="item.userId"
                   ></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="起止时间" prop="startDate">
+          <el-form-item label="起止时间" prop="projectStartDate">
             <el-col :span="11">
               <el-date-picker
                 type="date"
                 placeholder="选择日期"
-                v-model="form.startDate"
+                v-model="form.projectStartDate"
                 style="width: 100%"
               ></el-date-picker>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
-            <el-col :span="11" prop="endDate">
+            <el-col :span="11" prop="projectEndDate">
               <el-date-picker
                 type="date"
                 placeholder="选择日期"
-                v-model="form.endDate"
+                v-model="form.projectEndDate"
                 style="width: 100%"
               ></el-date-picker>
             </el-col>
           </el-form-item>
           <el-row>
             <el-col :span="12">
-              <el-form-item label="开发语言" prop="languages">
-                <el-select v-model="form.languages" multiple style="width: 100%" placeholder="请选择">
+              <el-form-item label="开发语言" prop="projectLanguages">
+                <el-select v-model="form.projectLanguages" multiple style="width: 100%" placeholder="请选择">
                   <el-option v-for="item in languagesList" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="开发框架" prop="frameworks">
-                <el-input type="textarea" v-model="form.frameworks"></el-input>
+              <el-form-item label="开发框架" prop="projectFrameworks">
+                <el-input type="textarea" v-model="form.projectFrameworks"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">立即创建</el-button>
-            <el-button @click="onSubmit">取消</el-button>
+            <el-button type="primary" @click="createProject">立即创建</el-button>
+            <el-button @click="cancel">取消</el-button>
           </el-form-item>
         </el-card>
       </el-col>
@@ -128,18 +127,18 @@
             <el-col :span="14">
               <el-form-item
                 :label="'里程碑' + index"
-                :prop="'projectMilestones.' + index + '.contents'"
+                :prop="'projectMilestones.' + index + '.milestoneContent'"
                 :rules="{
               required: true, message: '内容不能为空', trigger: 'blur'
             }"
               >
-                <el-input type="textarea" v-model="milestone.contents"></el-input>
+                <el-input type="textarea" v-model="milestone.milestoneContent"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item
                 label-width="0"
-                :prop="'projectMilestones.' + index + '.time'"
+                :prop="'projectMilestones.' + index + '.milestoneDate'"
                 :rules="{
               required: true, message: '时间不能为空', trigger: 'blur'
             }"
@@ -147,7 +146,7 @@
                 <el-date-picker
                   type="date"
                   placeholder="选择日期"
-                  v-model="milestone.time"
+                  v-model="milestone.milestoneDate"
                   style="width: 100%"
                 ></el-date-picker>
               </el-form-item>
@@ -163,8 +162,9 @@
 </template>
 
 <script>
-  import {getProjectIDList} from "@/api/project";
+  import {createProject, getProjectIDList} from "@/api/project";
   import {getClientInfo} from "@/api/client";
+  import {getAllUser} from "@/api/user";
 
 export default {
   name: "AddProject",
@@ -173,141 +173,28 @@ export default {
       form: {
         projectID: "",
         projectName: "",
-        client_id: "",
+        projectClientID: "",
         client_contact_name: "",
         client_company: "",
-        startDate: "",
-        endDate: "",
+        projectStartDate: "",
+        projectEndDate: "",
         projectMonitorID: "",
         projectManagerID: "",
         projectMilestones: [
           {
-            time: "",
-            contents: ""
+            milestoneDate: "",
+            milestoneContent: ""
           }
         ],
-        languages: [],
-        frameworks: "",
-        functions: [
-          {
-            id: "54321-0001",
-            name: "一级功能1",
-            project: "54321",
-            children: [
-              {
-                id: "54321-0001-001",
-                name: "二级功能1-1",
-                project: "54321"
-              },
-              {
-                id: "54321-0001-002",
-                name: "二级功能1-2",
-                project: "54321",
-                children: [
-                  {
-                    id: "54321-0001-002-001",
-                    name: "二级功能1-2-1",
-                    project: "54321"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: "54321-0002",
-            name: "一级功能2",
-            project: "54321"
-          },
-          {
-            id: "54321-0003",
-            name: "一级功能3",
-            project: "54321"
-          }
-        ],
-        userList: [
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          },
-          {
-            userName: "张三",
-            userMail: "839234349@qq.com",
-            userType: "EPG",
-            userManage: "李四"
-          }
-        ]
+        projectLanguages: [],
+        projectFrameworks: "",
       },
       languagesList: ["Java", "C", "C++", "JavaScript", "Swift", "Python", "PHP", "Go"],
-      options: [],
-      value: [],
-      list: [],
-      loading: false,
-      states: [
-        "Alabama",
-        "Alaska",
-        "Arizona",
-        "Arkansas",
-        "California",
-        "Colorado",
-        "Connecticut",
-        "Delaware",
-        "Florida",
-        "Georgia",
-        "Hawaii",
-        "Idaho",
-        "Illinois",
-        "Indiana",
-        "Iowa",
-        "Kansas",
-        "Kentucky",
-        "Louisiana",
-        "Maine",
-        "Maryland",
-        "Massachusetts",
-        "Michigan",
-        "Minnesota",
-        "Mississippi",
-        "Missouri",
-        "Montana",
-        "Nebraska",
-        "Nevada",
-        "New Hampshire",
-        "New Jersey",
-        "New Mexico",
-        "New York",
-        "North Carolina",
-        "North Dakota",
-        "Ohio",
-        "Oklahoma",
-        "Oregon",
-        "Pennsylvania",
-        "Rhode Island",
-        "South Carolina",
-        "South Dakota",
-        "Tennessee",
-        "Texas",
-        "Utah",
-        "Vermont",
-        "Virginia",
-        "Washington",
-        "West Virginia",
-        "Wisconsin",
-        "Wyoming"
+      allUsers: [
+        { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
       ],
+      allProjectID: [],
+      loading: false,
       rules: {
         projectID: [
           { required: true, message: "请选择项目ID", trigger: "change" }
@@ -318,7 +205,7 @@ export default {
         projectMonitorID: [
           { required: true, message: "请选择项目上级", trigger: "change" }
         ],
-        startDate: [
+        projectStartDate: [
           {
             type: "date",
             required: true,
@@ -326,7 +213,7 @@ export default {
             trigger: "change"
           }
         ],
-        endDate: [
+        projectEndDate: [
           {
             type: "date",
             required: true,
@@ -334,7 +221,7 @@ export default {
             trigger: "change"
           }
         ],
-        languages: [
+        projectLanguages: [
           {
             type: "array",
             required: true,
@@ -342,7 +229,7 @@ export default {
             trigger: "change"
           }
         ],
-        frameworks: [
+        projectFrameworks: [
           { required: true, message: "请填写开发框架", trigger: "blur" }
         ],
         projectMilestones: [
@@ -352,22 +239,30 @@ export default {
     };
   },
   created: function() {
-    this.getProjectId()
-  },
-  mounted() {
-    this.list = this.states.map(item => {
-      return { value: `value:${item}`, label: `label:${item}` };
-    });
+    this.getProjectId();
+    this.getAllUser();
   },
   methods: {
     getProjectId() {
       getProjectIDList().then(response => {
-        const { data } = response
-        this.options = data
+        const { data } = response;
+        this.allProjectID = data;
       })
     },
-    onSubmit() {
-      console.log("submit!");
+    getAllUser() {
+      getAllUser().then(res => {
+        const { data } = res;
+        this.allUsers = data;
+        console.log(data);
+      })
+    },
+    createProject() {
+      createProject(this.form).then(res => {
+        console.log(res);
+        // this.$router.push("/projectList");
+      });
+    },
+    cancel() {
       this.$router.push("/projectList");
     },
     handleProjectIdChange(projectID) {
@@ -379,7 +274,7 @@ export default {
       getClientInfo(clientId).then(response => {
         const { data } = response
         const { clientID,  clientCompany, clientContactName } = data
-        this.form.client_id = clientID
+        this.form.projectClientID = clientID
         this.form.client_company = clientCompany
         this.form.client_contact_name = clientContactName
       })
@@ -396,19 +291,6 @@ export default {
         contents: ""
       });
     },
-    remoteMethod(query) {
-      if (query !== "") {
-        this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-          this.options = this.list.filter(item => {
-            return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
-          });
-        }, 200);
-      } else {
-        this.options = [];
-      }
-    }
   }
 };
 </script>

@@ -36,3 +36,11 @@ export function updateProjectInfo(projectInfo) {
   })
 }
 
+export function createProject(projectInfo) {
+  return request({
+    url: 'project/createProjectByID',
+    method: 'post',
+    data: projectInfo
+  })
+}
+
