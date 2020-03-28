@@ -14,22 +14,22 @@
           <el-collapse-item title="Git权限" name="1">
             <div class="tip">允许成员读写项目Git库</div>
             <div v-for="(item,index) in userListGit" :key="index" class="text item">
-              {{item.userName}}，{{item.userRole}}，{{item.userMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('Git', index)">删除</el-button>
+              {{item.memberName}}，{{item.memberRoleString}}，{{item.memberMail}}
+              <el-button type="text" class="btn-text-red" @click="handleDelete('Git', item.memberID)">删除</el-button>
             </div>
           </el-collapse-item>
           <el-collapse-item title="文件服务器权限" name="2">
             <div class="tip">允许成员读写项目文件服务器</div>
             <div v-for="(item,index) in userListFile" :key="index" class="text item">
-              {{item.userName}}，{{item.userRole}}，{{item.userMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('File', index)">删除</el-button>
+              {{item.memberName}}，{{item.memberRoleString}}，{{item.memberMail}}
+              <el-button type="text" class="btn-text-red" @click="handleDelete('File', item.memberID)">删除</el-button>
             </div>
           </el-collapse-item>
           <el-collapse-item title="邮件通知权限" name="3">
             <div class="tip">管理成员接收通知邮件权限</div>
             <div v-for="(item,index) in userListMail" :key="index" class="text item">
-              {{item.userName}}，{{item.userRole}}，{{item.userMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('Mail', index)">删除</el-button>
+              {{item.memberName}}，{{item.memberRoleString}}，{{item.memberMail}}
+              <el-button type="text" class="btn-text-red" @click="handleDelete('Mail', item.memberID)">删除</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>
@@ -50,7 +50,12 @@
           <el-col :span="12">
             <el-form-item label="成员选择">
               <el-select v-model="addForm.users" multiple placeholder="请选择">
-                <el-option v-for="item in userListGit" :key="item.userName" :label="item.userName" :value="item.userName"></el-option>
+                <el-option
+                  v-for="item in allMemberList"
+                  :key="item.memberID"
+                  :label="item.memberName"
+                  :value="item.memberID"
+                ></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -65,6 +70,9 @@
 </template>
 
 <script>
+  import {addAuthority, deleteAuthority, getAllMembersByAuthority} from "@/api/authority";
+import {getMembers} from "@/api/Member";
+
 export default {
   data() {
     return {
@@ -73,89 +81,129 @@ export default {
       addFormVisible: false,
       addForm: {
         type: "",
-        users: ""
+        users: []
       },
       typeList: ["Git权限", "文件服务器权限", "邮件通知权限"],
+      allMemberList: [],
       userListGit: [
         {
-          userName: "小李",
-          userRole: "项目经理",
-          userMail: "12345678@qq.com"
+          memberName: "小李",
+          memberRoleString: "项目经理",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小六",
-          userRole: "开发",
-          userMail: "12345678@qq.com"
+          memberName: "小六",
+          memberRoleString: "开发",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小明",
-          userRole: "QA",
-          userMail: "12345678@qq.com"
+          memberName: "小明",
+          memberRoleString: "QA",
+          memberMail: "12345678@qq.com"
         }
       ],
       userListFile: [
         {
-          userName: "小李",
-          userRole: "项目经理",
-          userMail: "12345678@qq.com"
+          memberName: "小李",
+          memberRoleString: "项目经理",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小六",
-          userRole: "开发",
-          userMail: "12345678@qq.com"
+          memberName: "小六",
+          memberRoleString: "开发",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小明",
-          userRole: "QA",
-          userMail: "12345678@qq.com"
+          memberName: "小明",
+          memberRoleString: "QA",
+          memberMail: "12345678@qq.com"
         }
       ],
       userListMail: [
         {
-          userName: "小李",
-          userRole: "项目经理",
-          userMail: "12345678@qq.com"
+          memberName: "小李",
+          memberRoleString: "项目经理",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小六",
-          userRole: "开发",
-          userMail: "12345678@qq.com"
+          memberName: "小六",
+          memberRoleString: "开发",
+          memberMail: "12345678@qq.com"
         },
         {
-          userName: "小明",
-          userRole: "QA",
-          userMail: "12345678@qq.com"
+          memberName: "小明",
+          memberRoleString: "QA",
+          memberMail: "12345678@qq.com"
         }
-      ]
+      ],
+      memberRoleTypeList: ["项目经理", "QA", "QALeader", "开发", "开发Leader", "EPG"]
     };
   },
+  created() {
+    this.getAllAuthority();
+    this.getAllMembers();
+  },
   methods: {
+    getAllMembers() {
+      getMembers(this.$store.state.project.currentProjectId, -1).then(res => {
+        const { data } = res;
+        this.allMemberList = data.map( member => this.convertRoleToRoleString(member) );
+      })
+    },
+    getAllAuthority() {
+      getAllMembersByAuthority(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        this.userListFile = data.file.map( member => this.convertRoleToRoleString(member) );
+        this.userListGit = data.git.map( member => this.convertRoleToRoleString(member) );
+        this.userListMail = data.mail.map( member => this.convertRoleToRoleString(member) );
+      })
+    },
+    convertRoleToRoleString(member) {
+      const { memberRole } = member;
+      let roleString = "";
+      for (let j = 0; j < memberRole.length; j++) {
+        roleString = roleString + this.memberRoleTypeList[ memberRole[j] ];
+        if (j !== memberRole.length - 1) {
+          roleString = roleString + "、";
+        }
+      }
+      member.memberRoleString = roleString;
+      return member
+    },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
     handleAdd() {
       this.addFormVisible = true;
-      this.addForm = {};
+      this.addForm = {
+        type: "",
+        users: []
+      };
     },
     handleSubmit() {
-      this.addFormVisible = false;
+      addAuthority(
+        this.$store.state.project.currentProjectId,
+        this.addForm.users,
+        this.addForm.type
+      ).then(res => {
+        this.getAllAuthority();
+        this.addFormVisible = false;
+      }).catch(error => {
+          console.log(error.response)
+        });
     },
-    handleDelete(type, index) {
+    handleDelete(type, memberID) {
       this.$confirm("确认删除该用户权限吗?", "提示", {
         type: "warning"
       })
         .then(() => {
-          switch (type) {
-            case "Git":
-              this.userListGit.splice(index, 1);
-              break;
-            case "Mail":
-              this.userListMail.splice(index, 1);
-              break;
-            case "File":
-              this.userListFile.splice(index, 1);
-              break;
-          }
+          deleteAuthority(
+            this.$store.state.project.currentProjectId,
+            memberID,
+            type
+          ).then(res => {
+            this.getAllAuthority();
+          })
         })
         .catch(() => {});
     }
