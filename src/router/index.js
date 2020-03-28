@@ -91,6 +91,18 @@ export const constantRoutes = [
             component: () => import("@/views/projectInfo/workHour"),
             name: "WorkHour",
             meta: { title: "工时管理" }
+          },
+          {
+            path: "deviceList",
+            component: () => import("@/views/projectInfo/deviceList"),
+            name: "DeviceList",
+            meta: { title: "设备列表" }
+          },
+          {
+            path: "riskManagement",
+            component: () => import("@/views/projectInfo/riskManagement"),
+            name: "RiskManagement",
+            meta: { title: "风险管理" }
           }
         ]
       }
