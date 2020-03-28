@@ -43,6 +43,8 @@
           <el-table-column prop="status" label="状态" width="120" />
         </el-table>
       </el-tab-pane>
+      <el-tab-pane label="设备列表" name="deviceList"></el-tab-pane>
+      <el-tab-pane label="风险管理" name="riskManagement"></el-tab-pane>
     </el-tabs>
 
     <el-dialog title="登记工时记录" :visible.sync="workHourFormVisible">

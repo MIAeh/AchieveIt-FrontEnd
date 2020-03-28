@@ -35,6 +35,8 @@
         </el-collapse>
       </el-tab-pane>
       <el-tab-pane label="工时管理" name="workHour"></el-tab-pane>
+      <el-tab-pane label="设备列表" name="deviceList"></el-tab-pane>
+      <el-tab-pane label="风险管理" name="riskManagement"></el-tab-pane>
     </el-tabs>
 
     <el-dialog title="添加成员权限" :visible.sync="addFormVisible">

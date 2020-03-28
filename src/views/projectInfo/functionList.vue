@@ -40,6 +40,8 @@
       <el-tab-pane label="成员管理" name="memberManage"></el-tab-pane>
       <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
       <el-tab-pane label="工时管理" name="workHour"></el-tab-pane>
+      <el-tab-pane label="设备列表" name="deviceList"></el-tab-pane>
+      <el-tab-pane label="风险管理" name="riskManagement"></el-tab-pane>
     </el-tabs>
 
     <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
