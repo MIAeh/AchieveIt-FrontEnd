@@ -31,7 +31,7 @@
           <el-table-column fixed="right" label="操作" width="120">
             <template slot-scope="scope">
               <el-button
-                @click.native.prevent="handleDelete(scope.$index)"
+                @click.stop="handleDelete(scope.$index)"
                 type="text"
                 size="small"
                 class="btn-text-red"
@@ -91,7 +91,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="风险相关者">
-              <el-select v-model="addForm.riskUser" placeholder="请选择风险相关者">
+              <el-select v-model="addForm.riskUser" multiple placeholder="请选择风险相关者">
                 <el-option v-for="item in userList" :key="item" :label="item" :value="item"></el-option>
               </el-select>
             </el-form-item>
@@ -157,7 +157,7 @@ export default {
         riskLevel: "",
         riskImpact: "",
         riskManager: "",
-        riskUser: "",
+        riskUser: [],
         rickSolution: ""
       }
     };
@@ -200,6 +200,7 @@ export default {
 }
 .btn-text-red {
   color: #f56c6c;
+  float: none;
 }
 .btn-text-red:focus,
 .btn-text-red:hover {
