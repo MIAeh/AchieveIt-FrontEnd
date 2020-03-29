@@ -63,7 +63,7 @@
               <el-option v-for="item in deviceUserList" :key="item" :label="item" :value="item"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="设备使用者">
+          <el-form-item label="设备使用期限">
             <el-date-picker type="date" placeholder="选择日期" v-model="addFrom.deviceDate"></el-date-picker>
           </el-form-item>
         </el-row>
@@ -106,7 +106,7 @@ export default {
       ],
       deviceSearchList: [
         {
-          id: "PC-123123123123",
+          id: "PC-12312",
           label: "设备1"
         },
         {
@@ -114,7 +114,7 @@ export default {
           label: "设备2"
         },
         {
-          id: "PC-123123123123",
+          id: "PC-123123",
           label: "设备3"
         }
       ],
