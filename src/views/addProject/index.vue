@@ -20,12 +20,7 @@
                   @change="handleProjectIdChange"
                   style="width: 100%"
                 >
-                  <el-option
-                    v-for="item in allProjectID"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                  ></el-option>
+                  <el-option v-for="item in allProjectID" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -96,7 +91,12 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="开发语言" prop="projectLanguages">
-                <el-select v-model="form.projectLanguages" multiple style="width: 100%" placeholder="请选择">
+                <el-select
+                  v-model="form.projectLanguages"
+                  multiple
+                  style="width: 100%"
+                  placeholder="请选择"
+                >
                   <el-option v-for="item in languagesList" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
               </el-form-item>
@@ -156,15 +156,103 @@
             </el-col>
           </el-row>
         </el-card>
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>功能列表</span>
+            <el-button
+              @click="showCreateFunctionDialog"
+              style="float: right; padding: 3px 0"
+              type="text"
+            >新增功能</el-button>
+          </div>
+          <el-table
+            :data="form.projectFunctions"
+            border
+            style="width: 100%"
+            @cell-click="getFunctionInfo"
+            row-key="featureId"
+            default-expand-all
+            :tree-props="{children: 'allChildren'}"
+          >
+            <el-table-column prop="featureName" label="标题" width="120" />
+            <el-table-column prop="featureLevel" label="功能类别" width="120" />
+            <el-table-column prop="featureDescription" label="功能描述" />
+            <el-table-column fixed="right" label="操作" width="80">
+              <template slot-scope="scope">
+                <el-button
+                  @click.native.prevent="deleteFeature(scope.row)"
+                  type="text"
+                  size="small"
+                >删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
       </el-col>
     </el-form>
+
+    <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
+      <el-form :model="newFunction" label-position="top" :rules="newFunctionRules">
+        <el-form-item label="标题" prop="featureName">
+          <el-input v-model="newFunction.featureName"></el-input>
+        </el-form-item>
+        <el-form-item label="所属项目" v-if="false">
+          <el-input v-model="newFunction.projectId" :disabled="true"></el-input>
+        </el-form-item>
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="功能类型">
+              <el-select v-model="newFunction.featureLevel" @change="handleFeatureLevelChange">
+                <el-option
+                  v-for="item in functionTypeList"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="一级父功能">
+              <el-select :disabled="firstFatherDisabled" v-model="newFunction.firstFather">
+                <el-option
+                  v-for="item in firstFatherList"
+                  :key="item.featureId"
+                  :label="item.featureName"
+                  :value="item.featureId"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="二级父功能">
+              <el-select :disabled="secondFatherDisabled" v-model="newFunction.secondFather">
+                <el-option
+                  v-for="item in secondFatherList"
+                  :key="item.featureId"
+                  :label="item.featureName"
+                  :value="item.featureId"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="描述">
+          <el-input type="textarea" v-model="newFunction.featureDescription"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="createFunctionDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="createFeature">保 存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {createProject, getProjectIDList} from "@/api/project";
-  import {getClientInfo} from "@/api/client";
-  import {getAllUser} from "@/api/user";
+import { createProject, getProjectIDList } from "@/api/project";
+import { getClientInfo } from "@/api/client";
+import { getAllUser } from "@/api/user";
 
 export default {
   name: "AddProject",
@@ -188,8 +276,18 @@ export default {
         ],
         projectLanguages: [],
         projectFrameworks: "",
+        projectFunctions: []
       },
-      languagesList: ["Java", "C", "C++", "JavaScript", "Swift", "Python", "PHP", "Go"],
+      languagesList: [
+        "Java",
+        "C",
+        "C++",
+        "JavaScript",
+        "Swift",
+        "Python",
+        "PHP",
+        "Go"
+      ],
       allUsers: [
         { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
       ],
@@ -235,26 +333,74 @@ export default {
         projectMilestones: [
           { required: true, message: "请填写开发框架", trigger: "blur" }
         ]
-      }
+      },
+      newFunction: {
+        featureName: "",
+        featureLevel: 0,
+        firstFather: "",
+        secondFather: "",
+        featureDescription: ""
+      },
+      newFunctionRules: {
+        featureName: [{ required: true, message: "请输入标题" }]
+      },
+      createFunctionDialogVisible: false,
+      functionTypeList: [
+        {
+          label: "一级功能",
+          value: 0
+        },
+        {
+          label: "二级功能",
+          value: 1
+        },
+        {
+          label: "三级功能",
+          value: 2
+        }
+      ]
     };
   },
   created: function() {
     this.getProjectId();
     this.getAllUser();
   },
+  computed: {
+    firstFatherDisabled() {
+      return this.newFunction.featureLevel === 0;
+    },
+    secondFatherDisabled() {
+      return (
+        this.newFunction.featureLevel === 0 ||
+        this.newFunction.featureLevel === 1
+      );
+    },
+    firstFatherList() {
+      return this.form.projectFunctions;
+    },
+    secondFatherList() {
+      if (this.form.projectFunctions !== null && this.form.projectFunctions !== undefined) {
+        for (let i = 0; i < this.form.projectFunctions.length; i++) {
+          if (this.form.projectFunctions[i].featureId === this.newFunction.firstFather) {
+            return this.form.projectFunctions[i].allChildren;
+          }
+        }
+      }
+    }
+  },
   methods: {
     getProjectId() {
       getProjectIDList().then(response => {
         const { data } = response;
         this.allProjectID = data;
-      })
+      });
     },
     getAllUser() {
       getAllUser().then(res => {
         const { data } = res;
         this.allUsers = data;
         console.log(data);
-      })
+      });
     },
     createProject() {
       createProject(this.form).then(res => {
@@ -266,18 +412,14 @@ export default {
       this.$router.push("/projectList");
     },
     handleProjectIdChange(projectID) {
-      // this.form.clinet_id = (Math.random() * 1000).toFixed();
-      // const data = val.split(":");
-      // this.form.client_contact_name = data[0];
-      // this.form.client_company = data[1];
-      const clientId = projectID.split("-")[1]
+      const clientId = projectID.split("-")[1];
       getClientInfo(clientId).then(response => {
-        const { data } = response
-        const { clientID,  clientCompany, clientContactName } = data
-        this.form.projectClientID = clientID
-        this.form.client_company = clientCompany
-        this.form.client_contact_name = clientContactName
-      })
+        const { data } = response;
+        const { clientID, clientCompany, clientContactName } = data;
+        this.form.projectClientID = clientID;
+        this.form.client_company = clientCompany;
+        this.form.client_contact_name = clientContactName;
+      });
     },
     removeDomain(item) {
       let index = this.form.projectMilestones.indexOf(item);
@@ -291,6 +433,29 @@ export default {
         contents: ""
       });
     },
+    showCreateFunctionDialog() {
+      this.newFunction = {
+        featureName: "",
+        featureLevel: 0,
+        firstFather: "",
+        secondFather: "",
+        description: ""
+      };
+      this.createFunctionDialogVisible = true;
+    },
+    handleFeatureLevelChange(value) {
+      if (value === 0) {
+        this.newFunction.firstFather = "";
+        this.newFunction.secondFather = "";
+      } else if (value === 1) {
+        this.newFunction.secondFather = "";
+      }
+    },
+    createFeature() {
+      this.form.projectFunctions.push(this.newFunction);
+      this.createFunctionDialogVisible = false;
+    },
+    getFunctionInfo() {}
   }
 };
 </script>

@@ -13,7 +13,12 @@
             <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk">登记风险</el-button>
           </el-col>
           <el-col :span="4" :offset="16">
-            <el-button type="primary" icon="el-icon-download" style="float:right">导入风险</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-download"
+              style="float:right"
+              @click="importFormVisible = true"
+            >导入风险</el-button>
           </el-col>
         </el-row>
         <el-table :data="riskList" border style="width: 100%" @row-click="handleEdit">
@@ -115,6 +120,54 @@
         <el-button type="primary" @click="addSubmit">提交</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="导入风险信息" :visible.sync="importFormVisible">
+      <el-form :model="importForm" label-width="100px" label-position="center">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="导入类型">
+              <el-select
+                v-model="importForm.importType"
+                placeholder="请选择导入类型"
+                @change="getStandardRiskList"
+              >
+                <el-option v-for="item in importTypeList" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" v-show="importForm.importType === '其他项目'">
+            <el-form-item label="导入项目">
+              <el-select
+                v-model="importForm.importProject"
+                placeholder="请选择导入项目"
+                @change="getProjectRiskList"
+              >
+                <el-option v-for="item in riskLevelList" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-table :data="riskList" border style="width: 100%" @row-click="importProject">
+          <el-table-column prop="riskContent" label="风险描述" />
+          <el-table-column prop="riskType" label="类型" width="120" />
+          <el-table-column prop="riskLevel" label="级别" width="120" />
+          <el-table-column prop="riskImpact" label="影响度" width="120" />
+          <el-table-column prop="rickSolution" label="风险应对策略" width="140">
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <p>{{ scope.row.rickSolution }}</p>
+                <div slot="reference" class="name-wrapper">
+                  {{ scope.row.rickSolution | formatStringLong }}
+                </div>
+              </el-popover>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="importFormVisible = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -131,7 +184,8 @@ export default {
           riskManager: "小刘",
           riskLevel: "中",
           riskImpact: "高",
-          riskStatus: "处理中"
+          riskStatus: "处理中",
+          rickSolution: "阿莱克斯的结婚方式绝代风华阿斯顿开发环境阿斯顿开发哈看世界的合法函数圣诞节发货科技的书法考级哈收到尽快发货"
         },
         {
           riskID: "00123",
@@ -166,8 +220,19 @@ export default {
         riskManager: "",
         riskUser: [],
         rickSolution: ""
-      }
+      },
+      importFormVisible: false,
+      importForm: {
+        importType: "",
+        importProject: ""
+      },
+      importTypeList: ["标准风险库", "其他项目"]
     };
+  },
+  filters: {
+    formatStringLong(value) {
+      return value ? value.slice(0, 15) + '...' : '';
+    }
   },
   methods: {
     handleTabRoute(tab, event) {
@@ -187,13 +252,18 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.riskList[index].riskStatus = '已解决';
+          this.riskList[index].riskStatus = "已解决";
         })
         .catch(() => {});
     },
     handleAddRisk() {
       this.addFormVisible = true;
       this.addForm = {};
+      this.dialogTitle = "登记风险";
+    },
+    importProject(row) {
+      this.addFormVisible = true;
+      this.addForm = { ...row };
       this.dialogTitle = "登记风险";
     },
     addSubmit() {
@@ -203,7 +273,12 @@ export default {
       this.addFormVisible = true;
       this.addForm = { ...row };
       this.dialogTitle = "编辑风险";
-    }
+    },
+    getStandardRiskList() {
+      if (this.importForm.importType === "标准风险库") {
+      }
+    },
+    getProjectRiskList() {}
   }
 };
 </script>
