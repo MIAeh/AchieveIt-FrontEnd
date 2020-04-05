@@ -30,6 +30,7 @@
                 @click.native.prevent="handleReturn(scope.row)"
                 type="text"
                 size="small"
+                v-if="scope.row.deviceStatus !== 'Returned'"
               >归还</el-button>
             </template>
           </el-table-column>
@@ -86,29 +87,7 @@ export default {
   data() {
     return {
       activeTabName: "deviceList",
-      deviceList: [
-        // {
-        //   deviceID: "PC-123123123123",
-        //   deviceType: "PC",
-        //   deviceUser: "小明",
-        //   deviceDate: "2020-20-20",
-        //   deviceStatus: "使用中"
-        // },
-        // {
-        //   deviceID: "PHONE-123123123123",
-        //   deviceType: "PHONE",
-        //   deviceUser: "小明",
-        //   deviceDate: "2020-20-20",
-        //   deviceStatus: "已归还"
-        // },
-        // {
-        //   deviceID: "PAD-123123123123",
-        //   deviceType: "PAD",
-        //   deviceUser: "小明",
-        //   deviceDate: "2020-20-20",
-        //   deviceStatus: "已逾期"
-        // }
-      ],
+      deviceList: [],
       deviceSearchList: [
         "PAD-123123123123",
         "PHONE-123123123123"
