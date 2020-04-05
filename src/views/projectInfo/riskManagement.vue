@@ -22,7 +22,8 @@
           <el-table-column prop="riskType" label="类型" width="120" />
           <el-table-column prop="riskManager" label="责任人" width="140" />
           <el-table-column prop="riskLevel" label="级别" width="120" />
-          <el-table-column prop="riskImpact" label="影响度" width="140">
+          <el-table-column prop="riskImpact" label="影响度" width="120" />
+          <el-table-column prop="riskStatus" label="风险状态" width="140">
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.riskStatus === '已解决'">已解决</el-tag>
               <el-tag type="danger" v-else>处理中</el-tag>
@@ -30,6 +31,12 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="120">
             <template slot-scope="scope">
+              <el-button
+                @click.stop="handlePass(scope.$index)"
+                type="text"
+                size="small"
+                class="btn-text-green"
+              >确认解决</el-button>
               <el-button
                 @click.stop="handleDelete(scope.$index)"
                 type="text"
@@ -175,6 +182,15 @@ export default {
         })
         .catch(() => {});
     },
+    handlePass(index) {
+      this.$confirm("确认已解决吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          this.riskList[index].riskStatus = '已解决';
+        })
+        .catch(() => {});
+    },
     handleAddRisk() {
       this.addFormVisible = true;
       this.addForm = {};
@@ -205,6 +221,13 @@ export default {
 .btn-text-red:focus,
 .btn-text-red:hover {
   color: #f78989;
+}
+.btn-text-green {
+  color: #67c23a;
+}
+.btn-text-green:focus,
+.btn-text-green:hover {
+  color: #85ce61;
 }
 </style>
 
