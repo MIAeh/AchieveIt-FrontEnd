@@ -71,7 +71,7 @@
         <el-form-item label="标题" prop="featureName">
           <el-input v-model="newFunction.featureName"></el-input>
         </el-form-item>
-        <el-form-item label="所属项目">
+        <el-form-item label="所属项目" v-if="false">
           <el-input v-model="newFunction.projectId" :disabled="true"></el-input>
         </el-form-item>
         <el-row>
@@ -159,49 +159,36 @@ export default {
       activeTabName: "functionList",
       functions: [],
       importForm: {
-        // 弹窗的标题
         title: "导入功能列表",
-        // 提示信息
-        tips: ["名字必填", "年龄必填", "年龄请填写数字"],
-        // 假如数据库中是`name`字段, 而Excel模板列是`名字`, 就需要写成 name: '名字'
-        // ele-import 内部会抛弃非定义在fields里的列
+        tips: ["功能名称必填", "功能类型必填"],
         fields: {
-          name: "名字",
-          age: "年龄",
-          city: "所在城市"
+          featureName: "*功能名称",
+          featureDescription: "功能描述",
+          featureLevel: "*功能类型（一/二/三级功能）",
+          fatherFeatureName: "父功能名称（直系父功能）"
         },
-        // formatter起到替换数据的作用
         formatter: {
-          // 可以是对象, 在发送请求时, '深圳' 将被替换成 1, '广州' 被替换成 2
-          city: {
-            1: "深圳",
-            2: "广州"
+          featureLevel: {
+            0: "一级功能",
+            1: "二级功能",
+            2: "三级功能"
           },
-          // 可以是函数, 在发送请求时, `age` 将加1, 例如 原数据是 19 -> 20
-          age: function(value, row) {
+          firstFather: function(value, row) {
             return value + 1;
           }
         },
-        // 附加数据, 在每条记录上都会加这两个字段和值
         append: {
-          company: "腾讯",
-          leader: "小马哥"
+          projectID: this.$store.state.project.currentProjectId
         },
-        // 参数校检, 和 element-ui 中 form表单中传递的rules一样, 都是使用的 async-validator 库
-        // https://element.eleme.cn/#/zh-CN/component/form#biao-dan-yan-zheng
         rules: {
-          name: { type: "string", required: true, message: "名字必填" },
-          age: [
-            { type: "number", message: "年龄必须为数字" },
-            { required: true, message: "年龄必须填写" }
-          ]
+          featureName: {
+            type: "string",
+            required: true,
+            message: "功能名称必填"
+          },
+          featureLevel: [{ required: true, message: "功能类型必填" }]
         },
-        // Excel模板下载地址
-        // 注意, 只能是.xlsx的文件, .xls或者.cvs都会报错
-        filepath:
-          "https://raw.githubusercontent.com/dream2023/vue-ele-import/master/public/user.xlsx",
-        // 控制弹窗, 和dialog的visible一样
-        // https://element.eleme.cn/#/zh-CN/component/dialog
+        filepath: "http://116.62.181.135:8080/achieveit/功能列表导入模版.xlsx",
         visible: false
       },
       newFunction: {
@@ -312,6 +299,7 @@ export default {
       }
     },
     async requestFn(data) {
+      console.log(data);
       // 演示代码
       // 1、如果没有针对ele-import做过接口约定, 可以采用如下形式:
       // try {
@@ -336,24 +324,65 @@ export default {
     handleDownloadExcel() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then(excel => {
-        const tHeader = [ "项目ID","功能ID", "标题", "功能描述"];
+        const tHeader = [
+          "功能ID",
+          "功能名称",
+          "项目ID",
+          "功能描述",
+          "创建时间",
+          "功能类型",
+          "父功能名称",
+          "父功能ID"
+        ];
         const filterVal = [
-          "projectId",
           "featureId",
           "featureName",
-          "featureDescription"
+          "projectId",
+          "featureDescription",
+          "createTime",
+          "featureLevel",
+          "fatherFeatureName",
+          "fatherId"
         ];
-        const list = this.functions;
+        const list = this.treeToList(this.functions);
         const data = this.formatJson(filterVal, list);
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '功能列表',
+          filename: "功能列表",
           autoWidth: true,
-          bookType: 'xlsx'
+          bookType: "xlsx"
         });
         this.downloadLoading = false;
       });
+    },
+    treeToList(functions) {
+      let queen = [];
+      let out = [];
+      queen = queen.concat(functions);
+      while (queen.length) {
+        let first = queen.shift();
+        if (first.allChildren) {
+          queen = queen.concat(first.allChildren);
+          delete first["allChildren"];
+        }
+
+        out.push(first);
+      }
+      for (let index in out) {
+        switch (out[index].featureLevel) {
+          case 0:
+            out[index].featureLevel = "一级功能";
+            break;
+          case 1:
+            out[index].featureLevel = "二级功能";
+            break;
+          case 2:
+            out[index].featureLevel = "三级功能";
+            break;
+        }
+      }
+      return out;
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v =>
