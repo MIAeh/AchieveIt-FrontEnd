@@ -341,7 +341,7 @@ export default {
           "featureDescription",
           "createTime",
           "featureLevel",
-          "fatherFeatureName",
+          "fatherName",
           "fatherId"
         ];
         const list = this.treeToList(this.functions);
