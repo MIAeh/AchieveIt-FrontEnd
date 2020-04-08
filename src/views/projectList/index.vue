@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import { getProjectList } from "@/api/project";
 
 export default {
@@ -87,9 +86,6 @@ export default {
   },
   created: function() {
     this.getAllProject();
-  },
-  computed: {
-    ...mapGetters(["name"])
   },
   filters: {
     formatProjectStatus(val) {
