@@ -67,7 +67,7 @@
     </el-tabs>
 
     <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
-      <el-form :model="newFunction" label-position="top" :rules="newFunctionRules">
+      <el-form ref="newFunction" :model="newFunction" label-position="top" :rules="newFunctionRules">
         <el-form-item label="标题" prop="featureName">
           <el-input v-model="newFunction.featureName"></el-input>
         </el-form-item>
@@ -88,7 +88,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="一级父功能">
+            <el-form-item label="一级父功能" prop="firstFather">
               <el-select :disabled="firstFatherDisabled" v-model="newFunction.firstFather">
                 <el-option
                   v-for="item in firstFatherList"
@@ -100,7 +100,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="二级父功能">
+            <el-form-item label="二级父功能" prop="secondFather">
               <el-select :disabled="secondFatherDisabled" v-model="newFunction.secondFather">
                 <el-option
                   v-for="item in secondFatherList"
@@ -155,6 +155,18 @@ export default {
     EleImport
   },
   data() {
+    const validateFirstFather = (rule, value, callback) => {
+      if (this.newFunction.featureLevel !== 0) {
+        if (value === "") callback(new Error("请选择一级父功能"));
+      }
+      callback();
+    };
+    const validateSecondFather = (rule, value, callback) => {
+      if (this.newFunction.featureLevel === 2) {
+        if (value === "") callback(new Error("请选择二级父功能"));
+      }
+      callback();
+    };
     return {
       activeTabName: "functionList",
       functions: [],
@@ -200,7 +212,13 @@ export default {
         featureDescription: ""
       },
       newFunctionRules: {
-        featureName: [{ required: true, message: "请输入标题" }]
+        featureName: [{ required: true, message: "请输入标题" }],
+        firstFather: [
+          { validator: validateFirstFather, trigger: "change, blur" }
+        ],
+        secondFather: [
+          { validator: validateSecondFather, trigger: "change, blur" }
+        ]
       },
       functionInfo: {
         featureId: "",
@@ -279,9 +297,13 @@ export default {
       this.createFunctionDialogVisible = true;
     },
     createFeature() {
-      createFeature(this.newFunction).then(res => {
-        this.createFunctionDialogVisible = false;
-        this.getFeature();
+      this.$refs.newFunction.validate(valid => {
+        if (valid) {
+          createFeature(this.newFunction).then(res => {
+            this.createFunctionDialogVisible = false;
+            this.getFeature();
+          });
+        }
       });
     },
     deleteFeature(row) {
