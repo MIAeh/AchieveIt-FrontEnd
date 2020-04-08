@@ -6,7 +6,7 @@
       <el-tab-pane label="成员管理" name="memberManage">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">新增成员</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">{{ addUserFormTitle }}</el-button>
           </el-col>
         </el-row>
         <el-tabs type="card" @tab-click="handleRoleTabChange">
@@ -46,12 +46,12 @@
       <el-tab-pane label="风险管理" name="riskManagement"></el-tab-pane>
     </el-tabs>
 
-    <el-dialog title="新增成员" :visible.sync="addUserFromVisible">
-      <el-form :model="addUserFrom" label-width="100px" label-position="center">
+    <el-dialog :title="addUserFormTitle" :visible.sync="addUserFormVisible">
+      <el-form :model="addUserForm" label-width="100px" label-position="center">
         <el-row>
           <el-form-item label="添加成员">
             <el-select
-              v-model="addUserFrom.userID"
+              v-model="addUserForm.userID"
               filterable
               remote
               reserve-keyword
@@ -67,15 +67,11 @@
               ></el-option>
             </el-select>
           </el-form-item>
-<!--          <el-form-item label="角色">-->
-<!--            <el-select v-model="addUserFrom.memberRole" placeholder="请选择角色">-->
-<!--              <el-option v-for="item in memberRoleList" :key="item" :label="item" :value="item"></el-option>-->
-<!--            </el-select>-->
-<!--          </el-form-item>-->
+
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="addUserFromVisible = false">取消</el-button>
+        <el-button @click.native="addUserFormVisible = false">取消</el-button>
         <el-button type="primary" @click="addMember">提交</el-button>
       </div>
     </el-dialog>
@@ -101,11 +97,6 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <!--          <el-form-item label="角色">-->
-          <!--            <el-select v-model="addUserFrom.memberRole" placeholder="请选择角色">-->
-          <!--              <el-option v-for="item in memberRoleList" :key="item" :label="item" :value="item"></el-option>-->
-          <!--            </el-select>-->
-          <!--          </el-form-item>-->
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,34 +118,10 @@ export default {
     return {
       activeTabName: "memberManage",
       displayedMemberList: [],
-      memberList: [
-        {
-          memberName: "张三",
-          memberMail: "839234349@qq.com",
-          memberRoleString: "EPG",
-          superiorName: "李四"
-        },
-        {
-          memberName: "张三",
-          memberMail: "839234349@qq.com",
-          memberRoleString: "EPG",
-          superiorName: "李四"
-        },
-        {
-          memberName: "张三",
-          memberMail: "839234349@qq.com",
-          memberRoleString: "EPG",
-          superiorName: "李四"
-        },
-        {
-          memberName: "张三",
-          memberMail: "839234349@qq.com",
-          memberRoleString: "EPG",
-          superiorName: "李四"
-        }
-      ],
+      memberList: [],
       memberListByRole: [],
       memberCountByRole: [0, 0, 0, 0, 0, 0, 0],
+      addUserFormTitle: '新增项目成员',
       allUsers: [
         { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
       ],
@@ -165,8 +132,8 @@ export default {
       value: [],
       list: [],
       loading: false,
-      addUserFromVisible: false,
-      addUserFrom: {
+      addUserFormVisible: false,
+      addUserForm: {
         userID: null,
         memberRole: null
       },
@@ -182,11 +149,6 @@ export default {
   },
   created() {
     this.getMembers();
-  },
-  mounted() {
-    // this.list = this.states.map(item => {
-    //   return { value: `value:${item}`, label: `label:${item}` };
-    // });
   },
   methods: {
     getMembers() {
@@ -232,6 +194,7 @@ export default {
       }
     },
     handleRoleTabChange(tab) {
+      this.addUserFormTitle = '新增' + tab.label.split('(')[0];
       this.currentTab = tab.index;
       this.showCurrentMemberList();
     },
@@ -249,25 +212,25 @@ export default {
           }
         });
       }
-      this.addUserFromVisible = true;
-      this.addUserFrom = {
+      this.addUserFormVisible = true;
+      this.addUserForm = {
         userID: null,
         memberRole: null
       };
     },
     addMember() {
       if (this.currentTab === "0") {
-        addMember(this.$store.state.project.currentProjectId, this.addUserFrom.userID).then(res => {
+        addMember(this.$store.state.project.currentProjectId, this.addUserForm.userID).then(res => {
           this.getMembers();
-          this.addUserFromVisible = false;
+          this.addUserFormVisible = false;
         })
       } else {
         addMemberRole(
           this.$store.state.project.currentProjectId,
-          this.addUserFrom.userID,
+          this.addUserForm.userID,
           this.currentTab-1).then(res => {
           this.getMembers();
-          this.addUserFromVisible = false;
+          this.addUserFormVisible = false;
         })
       }
     },

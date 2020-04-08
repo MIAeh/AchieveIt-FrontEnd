@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import { getProjectList } from "@/api/project";
 
 export default {
@@ -79,18 +78,7 @@ export default {
         size: 10,
         searchCondition: ""
       },
-      allProject: [
-        {
-          projectID: "2019-0000-D-01",
-          projectName: "test project updated 1",
-          projectStatus: 0,
-          projectManagerName: "boss",
-          projectMonitorName: "tester",
-          projectClientContactName: "billy",
-          projectStartDate: "2019-11-11 00:00:00",
-          projectEndDate: "2021-11-11 00:00:00"
-        }
-      ],
+      allProject: [],
       underwayProject: [],
       startProject: [],
       finishedProject: []
@@ -98,9 +86,6 @@ export default {
   },
   created: function() {
     this.getAllProject();
-  },
-  computed: {
-    ...mapGetters(["name"])
   },
   filters: {
     formatProjectStatus(val) {
@@ -126,10 +111,10 @@ export default {
       }
     },
     getAllProject() {
-      // getProjectList("", -1).then(response => {
-      //   const { data } = response
-      //   this.allProject = data
-      // })
+      getProjectList("", -1).then(response => {
+        const { data } = response
+        this.allProject = data
+      })
     },
     getStartProject() {
       getProjectList("", 0).then(response => {

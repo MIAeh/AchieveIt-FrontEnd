@@ -48,7 +48,13 @@
     </el-tabs>
 
     <el-dialog title="登记工时记录" :visible.sync="workHourFormVisible">
-      <el-form :model="workHourForm" label-width="100px" label-position="center">
+      <el-form
+        ref="workHourForm"
+        :model="workHourForm"
+        :rules="workHourFormRules"
+        label-width="100px"
+        label-position="center"
+      >
         <el-row>
           <el-col :span="12">
             <el-form-item label="申报日期">
@@ -92,20 +98,21 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="起始时间" prop="dateTime">
-          <el-date-picker
+        <el-form-item label="起止时间" prop="dateTime">
+          <el-time-picker
+            is-range
             v-model="workHourForm.dateTime"
-            type="datetimerange"
             range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          ></el-date-picker>
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            placeholder="选择时间范围"
+          ></el-time-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'">保存</el-button>
-        <el-button type="danger" @click="handleSubmit" v-show="applyStatus === 'apply'">驳回</el-button>
-        <el-button type="success" @click="handleSubmit" v-show="applyStatus === 'apply'">批准</el-button>
+        <el-button type="danger" @click="handleSubmit" v-show="!newApply && applyStatus === 'apply'">驳回</el-button>
+        <el-button type="success" @click="handleSubmit" v-show="!newApply && applyStatus === 'apply'">批准</el-button>
       </div>
     </el-dialog>
   </div>
@@ -146,6 +153,11 @@ export default {
         function: "",
         dateTime: "",
         activity: ""
+      },
+      workHourFormRules: {
+        function: [{ required: true, message: "请选择功能名称" }],
+        activity: [{ required: true, message: "请选择活动名称" }],
+        dateTime: [{ required: true, message: "请选择起止时间" }]
       },
       functionList: null,
       activityList: [
@@ -250,7 +262,11 @@ export default {
       //   this.workHourForm = {};
     },
     handleSubmit() {
-      this.workHourFormVisible = false;
+      this.$refs.workHourForm.validate(valid => {
+        if (valid) {
+          this.workHourFormVisible = false;
+        }
+      });
     },
     handleClickFunction() {
       this.newApply = false;
