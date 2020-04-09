@@ -2,6 +2,7 @@
   <div class="dashboard-container">
     <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabRoute">
       <el-tab-pane label="基本信息" name="basicInfo"></el-tab-pane>
+      <el-tab-pane label="状态管理" name="stateManage"></el-tab-pane>
       <el-tab-pane label="功能列表" name="functionList"></el-tab-pane>
       <el-tab-pane label="成员管理" name="memberManage">
         <el-row class="dashboard-row">
