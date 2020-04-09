@@ -19,7 +19,7 @@
         <el-table :data="allProject" border style="width: 100%" @row-click="handleClickProject">
           <el-table-column prop="projectName" label="项目名称" width="180" />
           <el-table-column prop="projectStatus" label="项目状态" width="120">
-            <template scope="scope">{{ scope.row.projectStatus | formatProjectStatus }}</template>
+            <template slot-scope="scope">{{ scope.row.projectStatus | formatProjectStatus }}</template>
           </el-table-column>
           <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />

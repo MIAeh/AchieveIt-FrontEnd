@@ -69,6 +69,12 @@ export const constantRoutes = [
             meta: { title: "基本信息" }
           },
           {
+            path: "stateManage",
+            component: () => import("@/views/projectInfo/stateManage"),
+            name: "StateManage",
+            meta: { title: "状态管理" }
+          },
+          {
             path: "functionList",
             component: () => import("@/views/projectInfo/functionList"),
             name: "FunctionList",

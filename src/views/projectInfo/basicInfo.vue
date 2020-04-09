@@ -166,6 +166,7 @@
           </el-col>
         </el-form>
       </el-tab-pane>
+      <el-tab-pane label="状态管理" name="stateManage"></el-tab-pane>
       <el-tab-pane label="功能列表" name="functionList"></el-tab-pane>
       <el-tab-pane label="成员管理" name="memberManage"></el-tab-pane>
       <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
