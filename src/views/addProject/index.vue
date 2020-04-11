@@ -77,6 +77,7 @@
                   placeholder="选择日期"
                   v-model="form.projectStartDate"
                   style="width: 100%"
+                  value-format="yyyy-MM-dd"
                 ></el-date-picker>
               </el-col>
               <el-col class="line" :span="2">-</el-col>
@@ -86,6 +87,7 @@
                   placeholder="选择日期"
                   v-model="form.projectEndDate"
                   style="width: 100%"
+                  value-format="yyyy-MM-dd"
                 ></el-date-picker>
               </el-col>
             </el-form-item>
@@ -110,6 +112,24 @@
               <el-col :span="12">
                 <el-form-item label="开发框架" prop="projectFrameworks">
                   <el-input type="textarea" v-model="form.projectFrameworks"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="业务领域">
+                  <el-select
+                    v-model="form.domain"
+                    style="width: 100%"
+                    placeholder="请选择"
+                  >
+                    <el-option
+                      v-for="item in domainList"
+                      :key="item.domain"
+                      :label="item.domainContent"
+                      :value="item.domain"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -154,6 +174,7 @@
                     placeholder="选择日期"
                     v-model="milestone.milestoneDate"
                     style="width: 100%"
+                    value-format="yyyy-MM-dd"
                   ></el-date-picker>
                 </el-form-item>
               </el-col>
@@ -265,7 +286,7 @@
 </template>
 
 <script>
-import { createProject, getProjectIDList } from "@/api/project";
+import { createProject, getProjectIDList, getDomainList } from "@/api/project";
 import { getClientInfo } from "@/api/client";
 import { getAllUser } from "@/api/user";
 
@@ -294,7 +315,6 @@ export default {
         projectStartDate: "",
         projectEndDate: "",
         projectMonitorID: "",
-        projectManagerID: "",
         projectMilestones: [
           {
             milestoneDate: "",
@@ -303,6 +323,7 @@ export default {
         ],
         projectLanguages: [],
         projectFrameworks: "",
+        domain: '',
         projectFunctions: []
       },
       languagesList: [
@@ -318,6 +339,7 @@ export default {
       allUsers: [
         { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
       ],
+      domainList: [],
       allProjectID: [],
       loading: false,
       rules: {
@@ -397,6 +419,7 @@ export default {
   created: function() {
     this.getProjectId();
     this.getAllUser();
+    this.getDomainList();
   },
   filters: {
     formatFeatureLevel(val) {
@@ -439,6 +462,12 @@ export default {
         this.allUsers = data;
         console.log(data);
       });
+    },
+    getDomainList() {
+      getDomainList().then(res => {
+        const { data } = res;
+        this.domainList = data;
+      })
     },
     createProject() {
       createProject(this.form).then(res => {
