@@ -437,7 +437,6 @@ export default {
       getAllUser().then(res => {
         const { data } = res;
         this.allUsers = data;
-        console.log(data);
       });
     },
     createProject() {

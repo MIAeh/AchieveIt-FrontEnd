@@ -32,7 +32,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ userid: username.trim(), userpassword: password }).then(response => {
+      login({ userID: username.trim(), userPassword: password }).then(response => {
         const { data } = response
 
         if (!data) {
@@ -71,7 +71,7 @@ const actions = {
       // })
     })
   },
-  
+
   // user logout
   // logout({ commit, state }) {
   //   return new Promise((resolve, reject) => {

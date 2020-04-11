@@ -8,24 +8,24 @@
       <el-tab-pane label="工时管理" name="workHour">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleWorkHour">申报工时</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour">申报工时</el-button>
           </el-col>
           <el-col :span="2" :offset="18">
-            <el-dropdown class="dropdown-status">
+            <el-dropdown class="dropdown-status" @command="handleStatusChange">
               <span class="el-dropdown-link">
                 申报状态
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>全部</el-dropdown-item>
-                <el-dropdown-item>待批准</el-dropdown-item>
-                <el-dropdown-item>已批准</el-dropdown-item>
-                <el-dropdown-item>待修改</el-dropdown-item>
+                <el-dropdown-item command=-1>全部</el-dropdown-item>
+                <el-dropdown-item command=0>待批准</el-dropdown-item>
+                <el-dropdown-item command=1>已批准</el-dropdown-item>
+                <el-dropdown-item command=2>待修改</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </el-col>
         </el-row>
-        <el-tabs v-model="applyStatus">
+        <el-tabs v-model="applyStatus" @tab-click="handleWorkHourTabRoute">
           <el-tab-pane label="全部申报" name="all"></el-tab-pane>
           <el-tab-pane label="我的申报" name="my"></el-tab-pane>
           <el-tab-pane name="apply">
@@ -34,13 +34,15 @@
             </span>
           </el-tab-pane>
         </el-tabs>
-        <el-table :data="workHourList" @row-click="handleClickFunction" border style="width: 100%">
-          <el-table-column prop="id" label="工时记录ID" width="180" />
-          <el-table-column prop="date" label="申报日期" width="180" />
-          <el-table-column prop="person" label="申报人" width="180" />
-          <el-table-column prop="anotherPerson" label="审批人" width="180" />
-          <el-table-column prop="function" label="相关功能" />
-          <el-table-column prop="status" label="状态" width="120" />
+        <el-table :data="showWorkHourList" @row-click="handleClickWorkHour" border style="width: 100%">
+          <el-table-column prop="workHourId" label="工时记录ID" width="180" />
+          <el-table-column prop="applyTime" label="申报日期" width="180" />
+          <el-table-column prop="applyerName" label="申报人" width="180" />
+          <el-table-column prop="approverName" label="审批人" width="180" />
+          <el-table-column prop="featureName" label="相关功能" />
+          <el-table-column prop="status" label="状态" width="120">
+            <template scope="scope">{{ scope.row.status | ConvertStatus }}</template>
+          </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="设备列表" name="deviceList"></el-tab-pane>
@@ -58,41 +60,48 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="申报日期">
-              <el-input v-model="workHourForm.date" :readonly="true"></el-input>
+              <el-input v-model="workHourForm.applyTime" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="申报人">
-              <el-input v-model="workHourForm.person" :readonly="true"></el-input>
+              <el-input v-model="workHourForm.applyerName" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="审批人">
-              <el-input v-model="workHourForm.anotherPerson" :readonly="true"></el-input>
+              <el-input v-model="workHourForm.approverName" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="功能名称" prop="function">
+            <el-form-item label="功能名称" prop="featureName">
               <el-cascader
-                v-model="workHourForm.function"
+                v-model="workHourForm.featureName"
                 :options="functionList"
                 :show-all-levels="false"
-                :props="{ expandTrigger: 'hover', checkStrictly: true, value: 'featureId', label: 'featureName', children: 'allChildren' }"
+                :props="{
+                  expandTrigger: 'hover',
+                checkStrictly: true,
+                value: 'featureName',
+                label: 'featureName',
+                children: 'allChildren',
+                emitPath: false
+                }"
                 placeholder="请选择"
               ></el-cascader>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="活动名称" prop="activity">
+            <el-form-item label="活动名称" prop="activityName">
               <el-cascader
-                v-model="workHourForm.activity"
+                v-model="workHourForm.activityName"
                 :options="activityList"
                 :show-all-levels="false"
-                :props="{ expandTrigger: 'hover', value: 'label'}"
+                :props="{ expandTrigger: 'hover', value: 'label', emitPath: false}"
                 placeholder="请选择"
               ></el-cascader>
             </el-form-item>
@@ -106,13 +115,14 @@
             start-placeholder="开始时间"
             end-placeholder="结束时间"
             placeholder="选择时间范围"
+            value-format="timestamp"
           ></el-time-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'">保存</el-button>
-        <el-button type="danger" @click="handleSubmit" v-show="!newApply && applyStatus === 'apply'">驳回</el-button>
-        <el-button type="success" @click="handleSubmit" v-show="!newApply && applyStatus === 'apply'">批准</el-button>
+        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'">驳回</el-button>
+        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'">批准</el-button>
       </div>
     </el-dialog>
   </div>
@@ -120,43 +130,50 @@
 
 <script>
 import { getFeature } from "@/api/feature";
+import {
+  applyWorkHour, approveWorkHour,
+  getMyWorkHoursByProjectID,
+  getMyWorkHoursToApproveByProjectID,
+  getWorkHoursByProjectID, rejectWorkHour, updateWorkHour
+} from "@/api/workHour";
 
 export default {
   data() {
     return {
       activeTabName: "workHour",
       applyStatus: "all",
+      showWorkHourList: [],
       workHourList: [
         {
-          id: "00003",
-          date: "2020-03-20",
-          person: "张三",
-          anotherPerson: "李四",
-          function: "添加成员",
-          status: "待批准"
+          workHourId: "00003",
+          applyTime: "2020-03-20",
+          applyerName: "张三",
+          approverName: "李四",
+          featureName: "添加成员",
+          status: "0"
         },
         {
-          id: "00003",
-          date: "2020-03-20",
-          person: "张三",
-          anotherPerson: "李四",
-          function: "添加成员",
-          status: "待批准"
+          workHourId: "00003",
+          applyTime: "2020-03-20",
+          applyerName: "张三",
+          approverName: "李四",
+          featureName: "添加成员",
+          status: "0"
         }
       ],
       newApply: false,
       workHourFormVisible: false,
       workHourForm: {
-        date: "2020-03-20",
-        person: "张三",
-        anotherPerson: "李四",
-        function: "",
+        applyTime: "2020-03-20",
+        applyerName: "张三",
+        approverName: "李四",
+        featureName: "",
         dateTime: "",
-        activity: ""
+        activityName: ""
       },
       workHourFormRules: {
-        function: [{ required: true, message: "请选择功能名称" }],
-        activity: [{ required: true, message: "请选择活动名称" }],
+        featureName: [{ required: true, message: "请选择功能名称" }],
+        activityName: [{ required: true, message: "请选择活动名称" }],
         dateTime: [{ required: true, message: "请选择起止时间" }]
       },
       functionList: null,
@@ -238,11 +255,38 @@ export default {
             }
           ]
         }
-      ]
+      ],
     };
+  },
+  filters: {
+    ConvertStatus: function (statusNumber) {
+      let statusString = '';
+      switch (statusNumber) {
+        case 0:
+          statusString =  "待批准";
+          break;
+        case 1:
+          statusString =  "已批准";
+          break;
+        case 2:
+          statusString =  "待修改";
+          break;
+      }
+      return statusString;
+    },
+  },
+  computed: {
+    workHourByStatus() {
+      let workHourArray = [];
+      for (let status = 0; status < 3; status++) {
+        workHourArray.push(this.workHourList.filter(item => item.status === status));
+      }
+      return workHourArray;
+    }
   },
   created() {
     this.getFeature();
+    this.getWorkHour();
     // const today = new Date();
     // this.workHourForm.date
   },
@@ -253,24 +297,131 @@ export default {
         this.functionList = data;
       });
     },
+    getCurrentWorkHour() {
+      switch (this.applyStatus) {
+        case "all":
+          this.getWorkHour();
+          break;
+        case 'my':
+          this.getMyWorkHour();
+          break;
+        case 'apply':
+          this.getMyWorkHoursToApprove();
+      }
+    },
+    getWorkHour() {
+      getWorkHoursByProjectID(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        console.log(data);
+        this.workHourList = data;
+        this.showWorkHourList = this.workHourList;
+      })
+    },
+    getMyWorkHour() {
+      getMyWorkHoursByProjectID(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        console.log(data);
+        this.workHourList = data;
+        this.showWorkHourList = this.workHourList;
+      })
+    },
+    getMyWorkHoursToApprove() {
+      getMyWorkHoursToApproveByProjectID(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        console.log(data);
+        this.workHourList = data;
+        this.showWorkHourList = this.workHourList;
+      })
+    },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
-    handleWorkHour() {
+    handleWorkHourTabRoute(tab) {
+      switch (tab.name) {
+        case 'all':
+          this.getWorkHour();
+          break;
+        case 'my':
+          this.getMyWorkHour();
+          break;
+        case 'apply':
+          this.getMyWorkHoursToApprove();
+          break;
+      }
+    },
+    handleCreateWorkHour() {
       this.newApply = true;
       this.workHourFormVisible = true;
-      //   this.workHourForm = {};
+      this.clearWorkHourForm();
     },
     handleSubmit() {
       this.$refs.workHourForm.validate(valid => {
         if (valid) {
-          this.workHourFormVisible = false;
+          this.workHourForm.startTime = this.workHourForm.dateTime[0];
+          this.workHourForm.endTime = this.workHourForm.dateTime[1];
+          this.workHourForm.projectID = this.$store.state.project.currentProjectId;
+          if (this.newApply === true) {
+            applyWorkHour(
+              this.workHourForm.featureName,
+              this.workHourForm.activityName,
+              this.workHourForm.startTime,
+              this.workHourForm.endTime,
+              this.workHourForm.projectID
+            ).then(res => {
+              this.workHourFormVisible = false;
+              this.getCurrentWorkHour();
+            });
+          } else {
+            updateWorkHour(
+              this.workHourForm.projectId,
+              this.workHourForm.featureName,
+              this.workHourForm.activityName,
+              this.workHourForm.startTime,
+              this.workHourForm.endTime,
+            ).then(res => {
+              this.workHourFormVisible = false;
+              this.getCurrentWorkHour();
+            })
+          }
+          console.log(this.workHourForm);
         }
       });
     },
-    handleClickFunction() {
+    handleReject() {
+      rejectWorkHour(this.workHourForm.workHourId).then(res => {
+        this.workHourFormVisible = false;
+        this.getCurrentWorkHour();
+      })
+    },
+    handleApprove() {
+      approveWorkHour(this.workHourForm.workHourId).then(res => {
+        this.workHourFormVisible = false;
+        this.getCurrentWorkHour();
+      })
+    },
+    handleClickWorkHour(row) {
       this.newApply = false;
       this.workHourFormVisible = true;
+      row.dateTime = [row.startTime, row.endTime];
+      console.log(row);
+      this.workHourForm = row;
+    },
+    handleStatusChange(command) {
+      if (command >= 0) {
+        this.showWorkHourList = this.workHourByStatus[command];
+      } else {
+        this.showWorkHourList = this.workHourList;
+      }
+    },
+    clearWorkHourForm() {
+      this.workHourForm = {
+        applyTime: "",
+        applyerName: "",
+        approverName: "",
+        featureName: "",
+        dateTime: "",
+        activityName: ""
+      };
     }
   }
 };
