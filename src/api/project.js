@@ -11,6 +11,13 @@ export function getProjectList(searchCondition, projectStatus) {
   })
 }
 
+export function getDomainList() {
+  return request({
+    url: 'project/getDomainList',
+    method: 'get'
+  })
+}
+
 export function getProjectIDList() {
   return request({
     url: 'project/getProjectIDList',
