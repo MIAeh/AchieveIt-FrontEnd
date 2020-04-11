@@ -173,6 +173,8 @@
 </template>
 
 <script>
+import {getRisksByProjectID} from "@/api/risk";
+
 export default {
   data() {
     return {
@@ -235,7 +237,16 @@ export default {
       return value ? value.slice(0, 15) + '...' : '';
     }
   },
+  created() {
+    this.getRisk();
+  },
   methods: {
+    getRisk() {
+      getRisksByProjectID(this.$store.state.project.currentProjectId).then(res => {
+        const { data } = res;
+        console.log(data);
+      })
+    },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
