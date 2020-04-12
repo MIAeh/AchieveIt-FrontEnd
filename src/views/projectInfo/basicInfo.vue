@@ -79,6 +79,7 @@
                     v-model="form.projectStartDate"
                     style="width: 100%"
                     :disabled="editMode"
+                    value-format="yyyy-MM-dd"
                   ></el-date-picker>
                 </el-col>
                 <el-col class="line" :span="2">-</el-col>
@@ -89,6 +90,7 @@
                     v-model="form.projectEndDate"
                     style="width: 100%"
                     :disabled="editMode"
+                    value-format="yyyy-MM-dd"
                   ></el-date-picker>
                 </el-col>
               </el-form-item>
@@ -170,6 +172,7 @@
                       v-model="milestone.milestoneDate"
                       :disabled="editMode"
                       style="width: 100%"
+                      value-format="yyyy-MM-dd"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>

@@ -338,6 +338,7 @@ export default {
       try {
         debugger
         const res = await uploadFeatureList({'data': data});
+        this.getFeature();
         return Promise.resolve()
       } catch (error) {
         // error经过一系列转化, 转为
