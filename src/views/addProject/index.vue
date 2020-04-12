@@ -480,11 +480,12 @@ export default {
           delete item.secondFather;
         })
       }
-      console.log(this.form)
-      debugger
       createProject(this.form).then(res => {
-        console.log(res);
-        // this.$router.push("/projectList");
+        this.$message({
+          message: '创建成功',
+          type: 'success'
+        });
+        this.$router.push("/projectList");
       });
     },
     cancel() {
