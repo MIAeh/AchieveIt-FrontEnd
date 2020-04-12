@@ -42,7 +42,7 @@
           <el-table-column prop="approverName" label="审批人" width="180" />
           <el-table-column prop="featureName" label="相关功能" />
           <el-table-column prop="status" label="状态" width="120">
-            <template scope="scope">{{ scope.row.status | ConvertStatus }}</template>
+            <template slot-scope="scope">{{ scope.row.status | ConvertStatus }}</template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
@@ -405,7 +405,7 @@ export default {
       this.workHourFormVisible = true;
       row.dateTime = [row.startTime, row.endTime];
       console.log(row);
-      this.workHourForm = row;
+      this.workHourForm = { ...row };
     },
     handleStatusChange(command) {
       if (command >= 0) {
