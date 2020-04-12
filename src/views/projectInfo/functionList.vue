@@ -140,14 +140,14 @@
       </el-form>
       <span slot="footer">
         <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createFunctionDialogVisible = false">保 存</el-button>
+        <el-button type="primary" @click="updateFeature">保 存</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { createFeature, deleteFeature, getFeature } from "@/api/feature";
+  import {createFeature, deleteFeature, getFeature, updateFeatureByFeatureID} from "@/api/feature";
 import EleImport from "vue-ele-import";
 
 export default {
@@ -284,7 +284,9 @@ export default {
     },
     getFunctionInfo(row, column) {
       this.functionInfo = row;
-      if (column.label !== "操作") this.functionInfoDialogVisible = true;
+      if (column.label !== "操作"){
+        this.functionInfoDialogVisible = true;
+      }
     },
     showCreateFunctionDialog() {
       this.newFunction = {
@@ -312,7 +314,15 @@ export default {
         this.getFeature();
       });
     },
-    updateFeature() {},
+    updateFeature() {
+      updateFeatureByFeatureID(
+        this.functionInfo.featureId,
+        this.functionInfo.featureName,
+        this.functionInfo.featureDescription,
+      ).then(res => {
+        this.getFeature();
+      })
+    },
     handleFeatureLevelChange(value) {
       if (value === 0) {
         this.newFunction.firstFather = "";
