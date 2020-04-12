@@ -66,7 +66,7 @@
               </div>
               <el-button slot="reference">审批归档</el-button>
             </el-popover>
-            <el-button v-if="activeStatus === 5" @click="setArchivedLink">申请归档</el-button>
+            <el-button v-if="activeStatus === 5 && !projectSubStatus.archived" @click="setArchivedLink">申请归档</el-button>
           </div>
         </el-row>
         <el-row class="dashboard-row-stateManage">
@@ -227,6 +227,7 @@ export default {
   },
   mounted() {
     this.getProjectStatus();
+    this.getArchiveLink();
   },
   methods: {
     handleTabRoute(tab, event) {
@@ -240,7 +241,10 @@ export default {
         const { data } = res;
         this.activeStatus = data.projectStatus + 1;
         this.projectSubStatus = { ...data.projectSubStatus };
-        if (this.activeStatus > 2 || this.projectSubStatus.configurationCompleted) {
+        if (
+          this.activeStatus > 2 ||
+          this.projectSubStatus.configurationCompleted
+        ) {
           this.setBasicStatus = "finish";
         }
         if (this.activeStatus > 2 || this.projectSubStatus.allocatedQA) {
@@ -258,16 +262,11 @@ export default {
       });
     },
     getArchiveLink() {
-      getArchiveLink().then(res => {
+      getArchiveLink(this.projectID).then(res => {
         const { data } = res;
         this.link = data.archiveLink;
       });
     },
-    // next() {
-    //   this.visible = false;
-    //   this.activeStatus++;
-    //   // if (this.activeStatus++ > 4) this.activeStatus = 1;
-    // },
     approveApplication() {
       approveApplication(this.projectID).then(res => {
         if (res.errorCode == "200") this.getProjectStatus();
@@ -280,7 +279,6 @@ export default {
       });
     },
     setBasic() {
-      // this.setVisible = false;
       confirmConfigurationCompleted(this.projectID).then(res => {
         if (res.errorCode == "200") this.getProjectStatus();
       });
@@ -317,7 +315,6 @@ export default {
       });
     },
     setArchivedLink() {
-      this.getArchiveLink();
       this.addFormTitle = "申请归档";
       this.addFormVisible = true;
       this.addForm = {
