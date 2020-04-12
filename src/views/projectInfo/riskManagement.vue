@@ -26,14 +26,14 @@
           <el-table-column prop="riskID" label="风险ID" width="140" />
           <el-table-column prop="riskDescription" label="风险描述" />
           <el-table-column prop="riskType" label="类型" width="120">
-            <template scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
           </el-table-column>
           <el-table-column prop="riskChargerName" label="责任人" width="140" />
           <el-table-column prop="riskLevel" label="级别" width="120">
-            <template scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
           </el-table-column>
           <el-table-column prop="riskInfluence" label="影响度" width="120">
-            <template scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
           </el-table-column>
           <el-table-column prop="riskStatus" label="风险状态" width="140">
             <template slot-scope="scope">
@@ -157,13 +157,13 @@
         <el-table :data="templateList" border style="width: 100%" @row-click="importProject">
           <el-table-column prop="riskDescription" label="风险描述" />
           <el-table-column prop="riskType" label="类型" width="120">
-            <template scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
           </el-table-column>
           <el-table-column prop="riskLevel" label="级别" width="120">
-            <template scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
           </el-table-column>
           <el-table-column prop="riskInfluence" label="影响度" width="120">
-            <template scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
+            <template slot-scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
           </el-table-column>
           <el-table-column prop="riskStrategy" label="风险应对策略" width="140">
             <template slot-scope="scope">
