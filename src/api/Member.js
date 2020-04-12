@@ -22,6 +22,17 @@ export function addMember(projectID, memberID) {
   })
 }
 
+export function deleteMember(projectID, memberID) {
+  return request({
+    url: '/project/deleteMemberByID',
+    method: 'post',
+    params: {
+      projectID: projectID,
+      memberID: memberID
+    }
+  })
+}
+
 export function addMemberRole(projectID, memberID, memberRole) {
   return request({
     url: 'project/addMemberRoleByID',
