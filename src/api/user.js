@@ -23,6 +23,14 @@ export function getAllUser() {
   })
 }
 
+export function getAvailableUser(data) {
+  return request({
+    url: '/user/getAvailableUserInfoByID',
+    method: 'get',
+    params: data
+  })
+}
+
 // export function logout() {
 //   return request({
 //     url: '/vue-admin-template/user/logout',

@@ -147,7 +147,7 @@
 </template>
 
 <script>
-  import {createFeature, deleteFeature, getFeature, updateFeatureByFeatureID} from "@/api/feature";
+import { createFeature, deleteFeature, getFeature, uploadFeatureList, updateFeatureByFeatureID } from "@/api/feature";
 import EleImport from "vue-ele-import";
 
 export default {
@@ -335,18 +335,22 @@ export default {
       console.log(data);
       // 演示代码
       // 1、如果没有针对ele-import做过接口约定, 可以采用如下形式:
-      // try {
-      //   const res = await axios.post('/user', data)
-      //   return Promise.resolve()
-      // } catch (error) {
-      //   // error经过一系列转化, 转为
-      //   const errorData = this.getErrorMessage(error)
-      //   {0:{ age: '年龄为数字', city: '城市必填'}, 2:{ age: '年龄为数字'} } // 0 和 2 分别是行号
-      //   return Promise.reject(errorData)
-      // }
+      try {
+        debugger
+        const res = await uploadFeatureList({'data': data});
+        return Promise.resolve()
+      } catch (error) {
+        // error经过一系列转化, 转为
+        const errorData = this.getErrorMessage(error)
+        // {0:{ age: '年龄为数字', city: '城市必填'}, 2:{ age: '年龄为数字'} } // 0 和 2 分别是行号
+        return Promise.reject(errorData)
+      }
       // 2、如果针对ele-import做过接口约定, 当校检错误时, 后端返回的 error 就是上述错误形式, 则可直接
       // return axios.post('/user', data)
       // 总结: 无论如何总要返回一个Promise对象
+    },
+    getErrorMessage() {
+
     },
     handleCloseImport() {
       console.log("弹窗关闭了~");
