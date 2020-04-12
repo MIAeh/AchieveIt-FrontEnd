@@ -110,7 +110,14 @@
 </template>
 
 <script>
-  import {addMember, addMemberRole, changeMemberSuperior, deleteMemberRole, getMembers} from "@/api/Member";
+  import {
+    addMember,
+    addMemberRole,
+    changeMemberSuperior,
+    deleteMember,
+    deleteMemberRole,
+    getMembers
+  } from "@/api/Member";
 import {getAllUser} from "@/api/user";
 
 export default {
@@ -244,7 +251,12 @@ export default {
     },
     deleteMember(row) {
       if (this.currentTab === "0") {
-
+        deleteMember(
+          this.$store.state.project.currentProjectId,
+          row.memberID,
+        ).then(res => {
+          this.getMembers();
+        })
       } else {
         deleteMemberRole(
           this.$store.state.project.currentProjectId,
