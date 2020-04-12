@@ -24,27 +24,33 @@
         </el-row>
         <el-table :data="riskList" border style="width: 100%" @row-click="handleEdit">
           <el-table-column prop="riskID" label="风险ID" width="140" />
-          <el-table-column prop="riskContent" label="风险描述" />
-          <el-table-column prop="riskType" label="类型" width="120" />
-          <el-table-column prop="riskManager" label="责任人" width="140" />
-          <el-table-column prop="riskLevel" label="级别" width="120" />
-          <el-table-column prop="riskImpact" label="影响度" width="120" />
+          <el-table-column prop="riskDescription" label="风险描述" />
+          <el-table-column prop="riskType" label="类型" width="120">
+            <template scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
+          </el-table-column>
+          <el-table-column prop="riskChargerName" label="责任人" width="140" />
+          <el-table-column prop="riskLevel" label="级别" width="120">
+            <template scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
+          </el-table-column>
+          <el-table-column prop="riskInfluence" label="影响度" width="120">
+            <template scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
+          </el-table-column>
           <el-table-column prop="riskStatus" label="风险状态" width="140">
             <template slot-scope="scope">
-              <el-tag type="success" v-if="scope.row.riskStatus === '已解决'">已解决</el-tag>
+              <el-tag type="success" v-if="scope.row.riskStatus == '1'">已解决</el-tag>
               <el-tag type="danger" v-else>处理中</el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="120">
             <template slot-scope="scope">
               <el-button
-                @click.stop="handlePass(scope.$index)"
+                @click.stop="handlePass(scope.row)"
                 type="text"
                 size="small"
                 class="btn-text-green"
               >确认解决</el-button>
               <el-button
-                @click.stop="handleDelete(scope.$index)"
+                @click.stop="handleDelete(scope.row)"
                 type="text"
                 size="small"
                 class="btn-text-red"
@@ -59,20 +65,20 @@
       <el-form :model="addForm" label-width="100px" label-position="center">
         <el-row>
           <el-form-item label="风险描述">
-            <el-input v-model="addForm.riskContent"></el-input>
+            <el-input v-model="addForm.riskDescription"></el-input>
           </el-form-item>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="风险类型">
               <el-select v-model="addForm.riskType" placeholder="请选择">
-                <el-option v-for="item in riskTypeList" :key="item" :label="item" :value="item"></el-option>
+                <el-option v-for="(item, index) in riskTypeList" :key="item" :label="item" :value="index"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="风险跟踪频度">
-              <el-input v-model="addForm.riskRate" type="number">
+              <el-input v-model="addForm.riskFrequency" type="number">
                 <template slot="append">天/次</template>
               </el-input>
             </el-form-item>
@@ -82,14 +88,14 @@
           <el-col :span="12">
             <el-form-item label="风险级别">
               <el-select v-model="addForm.riskLevel" placeholder="请选择">
-                <el-option v-for="item in riskLevelList" :key="item" :label="item" :value="item"></el-option>
+                <el-option v-for="(item, index) in riskLevelList" :key="item" :label="item" :value="index"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="风险影响度">
-              <el-select v-model="addForm.riskImpact" placeholder="请选择">
-                <el-option v-for="item in riskLevelList" :key="item" :label="item" :value="item"></el-option>
+              <el-select v-model="addForm.riskInfluence" placeholder="请选择">
+                <el-option v-for="(item, index) in riskInfluenceList" :key="item" :label="item" :value="index"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -97,28 +103,28 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="责任人">
-              <el-select v-model="addForm.riskManager" placeholder="请选择责任人">
-                <el-option v-for="item in userList" :key="item" :label="item" :value="item"></el-option>
+              <el-select v-model="addForm.riskCharger" placeholder="请选择责任人">
+                <el-option v-for="item in userList" :key="item.memberID" :label="item.memberName" :value="item.memberID"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="风险相关者">
-              <el-select v-model="addForm.riskUser" multiple placeholder="请选择风险相关者">
-                <el-option v-for="item in userList" :key="item" :label="item" :value="item"></el-option>
+              <el-select v-model="addForm.riskHolders" multiple placeholder="请选择风险相关者">
+                <el-option v-for="item in userList" :key="item.memberID" :label="item.memberName" :value="item.memberID"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-form-item label="风险应对策略">
-            <el-input v-model="addForm.rickSolution" type="textarea" rows="4"></el-input>
+            <el-input v-model="addForm.riskStrategy" type="textarea" rows="4"></el-input>
           </el-form-item>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="addSubmit">提交</el-button>
+        <el-button type="primary" @click="handleSubmit">提交</el-button>
       </div>
     </el-dialog>
 
@@ -130,7 +136,7 @@
               <el-select
                 v-model="importForm.importType"
                 placeholder="请选择导入类型"
-                @change="getStandardRiskList"
+                @change="handleImportTypeChange"
               >
                 <el-option v-for="item in importTypeList" :key="item" :label="item" :value="item"></el-option>
               </el-select>
@@ -143,22 +149,28 @@
                 placeholder="请选择导入项目"
                 @change="getProjectRiskList"
               >
-                <el-option v-for="item in riskLevelList" :key="item" :label="item" :value="item"></el-option>
+                <el-option v-for="item in projectList" :key="item.projectID" :label="item.projectName" :value="item.projectID"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-table :data="riskList" border style="width: 100%" @row-click="importProject">
-          <el-table-column prop="riskContent" label="风险描述" />
-          <el-table-column prop="riskType" label="类型" width="120" />
-          <el-table-column prop="riskLevel" label="级别" width="120" />
-          <el-table-column prop="riskImpact" label="影响度" width="120" />
-          <el-table-column prop="rickSolution" label="风险应对策略" width="140">
+        <el-table :data="templateList" border style="width: 100%" @row-click="importProject">
+          <el-table-column prop="riskDescription" label="风险描述" />
+          <el-table-column prop="riskType" label="类型" width="120">
+            <template scope="scope">{{ scope.row.riskType | formatRiskTypeString }}</template>
+          </el-table-column>
+          <el-table-column prop="riskLevel" label="级别" width="120">
+            <template scope="scope">{{ scope.row.riskLevel | formatRiskLevelString }}</template>
+          </el-table-column>
+          <el-table-column prop="riskInfluence" label="影响度" width="120">
+            <template scope="scope">{{ scope.row.riskInfluence | formatRiskInfluenceString }}</template>
+          </el-table-column>
+          <el-table-column prop="riskStrategy" label="风险应对策略" width="140">
             <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
-                <p>{{ scope.row.rickSolution }}</p>
+                <p>{{ scope.row.riskStrategy }}</p>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.rickSolution | formatStringLong }}
+                  {{ scope.row.riskStrategy | formatStringLong }}
                 </div>
               </el-popover>
             </template>
@@ -173,7 +185,17 @@
 </template>
 
 <script>
-import {getRisksByProjectID} from "@/api/risk";
+  import {
+    addRisk,
+    deleteRisk,
+    getRisksByProjectID,
+    getRiskTemplates,
+    getRiskTemplatesByProjectID,
+    solveRisk,
+    updateRiskByRiskID
+  } from "@/api/risk";
+  import {getMembers} from "@/api/Member";
+  import {getProjectList} from "@/api/project";
 
 export default {
   data() {
@@ -182,47 +204,67 @@ export default {
       riskList: [
         {
           riskID: "00123",
-          riskContent: "风险描述书aaaaaa",
+          riskDescription: "风险描述书aaaaaa",
           riskType: "项目风险",
-          riskManager: "小刘",
+          riskFrequency: 0,
+          riskChargerName: "小刘",
+          riskHolders: [],
           riskLevel: "中",
-          riskImpact: "高",
-          riskStatus: "处理中",
-          rickSolution: "阿莱克斯的结婚方式绝代风华阿斯顿开发环境阿斯顿开发哈看世界的合法函数圣诞节发货科技的书法考级哈收到尽快发货"
+          riskInfluence: "高",
+          riskStatus: "0",
+          riskStrategy: "阿莱克斯的结婚方式绝代风华阿斯顿开发环境阿斯顿开发哈看世界的合法函数圣诞节发货科技的书法考级哈收到尽快发货"
         },
         {
           riskID: "00123",
-          riskContent: "风险描述书bbbbbb",
+          riskDescription: "风险描述书bbbbbb",
           riskType: "商业风险",
-          riskManager: "小刘",
+          riskFrequency: 0,
+          riskChargerName: "小刘",
           riskLevel: "中",
-          riskImpact: "低",
-          riskStatus: "已解决"
+          riskInfluence: "低",
+          riskStatus: "1"
         },
         {
           riskID: "00123",
-          riskContent: "风险描述书ccccc",
+          riskDescription: "风险描述书ccccc",
           riskType: "技术风险",
-          riskManager: "小刘",
+          riskFrequency: 0,
+          riskChargerName: "小刘",
           riskLevel: "低",
-          riskImpact: "高",
-          riskStatus: "处理中"
+          riskInfluence: "高",
+          riskStatus: "0"
         }
       ],
+      templateList: [],
+      projectList: [],
       riskTypeList: ["商业风险", "项目风险", "技术风险"],
-      userList: ["小明", "小刘", "小五"],
       riskLevelList: ["高", "中", "低"],
+      riskInfluenceList: ["高", "中", "低"],
+      userList: [
+        {
+          memberID: "b6703879-e1e2-499c-8ffe-d8b29f71f156",
+          memberName: "tester",
+        },
+        {
+          memberID: "48fb8377-664f-4a9b-b13f-6729b00a9e22",
+          memberName: "boss",
+        },
+        {
+          memberID: "0006",
+          memberName: "0.8064611509747337",
+        }
+      ],
       dialogTitle: "登记风险",
       addFormVisible: false,
       addForm: {
-        riskContent: "",
+        riskDescription: "",
         riskType: "",
-        riskRate: "",
+        riskFrequency: "",
         riskLevel: "",
-        riskImpact: "",
-        riskManager: "",
-        riskUser: [],
-        rickSolution: ""
+        riskInfluence: "",
+        riskCharger: "",
+        riskHolders: [],
+        riskStrategy: ""
       },
       importFormVisible: false,
       importForm: {
@@ -235,7 +277,31 @@ export default {
   filters: {
     formatStringLong(value) {
       return value ? value.slice(0, 15) + '...' : '';
-    }
+    },
+    formatRiskTypeString(typeNumber) {
+      const riskTypeList = ["商业风险", "项目风险", "技术风险"];
+      if (typeNumber >= 0 && typeNumber < riskTypeList.length) {
+        return riskTypeList[typeNumber];
+      } else {
+        return typeNumber;
+      }
+    },
+    formatRiskLevelString(levelNumber) {
+      const riskLevelList = ["高", "中", "低"];
+      if (levelNumber >= 0 && levelNumber < riskLevelList.length) {
+        return riskLevelList[levelNumber];
+      } else {
+        return levelNumber;
+      }
+    },
+    formatRiskInfluenceString(levelNumber) {
+      const riskInfluenceList = ["高", "中", "低"];
+      if (levelNumber >= 0 && levelNumber < riskInfluenceList.length) {
+        return riskInfluenceList[levelNumber];
+      } else {
+        return levelNumber;
+      }
+    },
   },
   created() {
     this.getRisk();
@@ -244,53 +310,108 @@ export default {
     getRisk() {
       getRisksByProjectID(this.$store.state.project.currentProjectId).then(res => {
         const { data } = res;
+        this.riskList = data;
         console.log(data);
       })
     },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
-    handleDelete(index) {
+    handleDelete(row) {
       this.$confirm("确认删除吗?", "提示", {
         type: "warning"
       })
         .then(() => {
-          this.riskList.splice(index, 1);
+          this.deleteRisk(row.riskID);
         })
         .catch(() => {});
     },
-    handlePass(index) {
+    handlePass(row) {
       this.$confirm("确认已解决吗?", "提示", {
         type: "warning"
       })
         .then(() => {
-          this.riskList[index].riskStatus = "已解决";
+          this.solveRisk(row.riskID);
         })
         .catch(() => {});
     },
     handleAddRisk() {
+      this.getMemberList();
       this.addFormVisible = true;
       this.addForm = {};
       this.dialogTitle = "登记风险";
     },
     importProject(row) {
+      this.getMemberList();
       this.addFormVisible = true;
       this.addForm = { ...row };
       this.dialogTitle = "登记风险";
     },
-    addSubmit() {
-      this.addFormVisible = false;
+    handleSubmit() {
+      if (this.dialogTitle === "登记风险") {
+        this.addRisk();
+      } else if (this.dialogTitle === "编辑风险") {
+        this.updateRisk();
+      }
     },
     handleEdit(row) {
+      this.getMemberList();
       this.addFormVisible = true;
       this.addForm = { ...row };
       this.dialogTitle = "编辑风险";
     },
-    getStandardRiskList() {
+    handleImportTypeChange() {
       if (this.importForm.importType === "标准风险库") {
+        getRiskTemplates().then(res => {
+          const { data } = res;
+          this.templateList = data;
+        })
+      } else {
+        this.getProjectList();
+        this.templateList = [];
       }
     },
-    getProjectRiskList() {}
+    getProjectRiskList() {
+      getRiskTemplatesByProjectID(this.importForm.importProject).then(res => {
+        const { data } = res;
+        this.templateList = data;
+      })
+    },
+    addRisk() {
+      this.addForm.projectID = this.$store.state.project.currentProjectId;
+      addRisk(this.addForm).then(res => {
+        this.addFormVisible = false;
+        this.getRisk();
+      })
+    },
+    updateRisk() {
+      updateRiskByRiskID(this.addForm).then(res => {
+        this.addFormVisible = false;
+        this.getRisk();
+      })
+    },
+    getMemberList() {
+      getMembers(this.$store.state.project.currentProjectId, -1).then(res => {
+        const { data } = res;
+        this.userList = data;
+      })
+    },
+    solveRisk(riskID) {
+      solveRisk(riskID).then(res => {
+        this.getRisk();
+      })
+    },
+    deleteRisk(riskID) {
+      deleteRisk(riskID).then(res => {
+        this.getRisk();
+      })
+    },
+    getProjectList() {
+      getProjectList("", -1).then(res => {
+        const { data } = res;
+        this.projectList = data;
+      })
+    }
   }
 };
 </script>

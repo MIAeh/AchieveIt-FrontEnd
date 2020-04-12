@@ -18,6 +18,8 @@
           <el-tab-pane :label="'开发('+memberCountByRole[4]+')'"></el-tab-pane>
           <el-tab-pane :label="'开发Leader('+memberCountByRole[5]+')'"></el-tab-pane>
           <el-tab-pane :label="'EPG('+memberCountByRole[6]+')'"></el-tab-pane>
+          <el-tab-pane :label="'测试('+memberCountByRole[7]+')'"></el-tab-pane>
+          <el-tab-pane :label="'资产管理者('+memberCountByRole[8]+')'"></el-tab-pane>
         </el-tabs>
         <el-table :data="displayedMemberList" border style="width: 100%">
           <el-table-column prop="memberName" label="用户名" width="200" />
@@ -110,7 +112,14 @@
 </template>
 
 <script>
-  import {addMember, addMemberRole, changeMemberSuperior, deleteMemberRole, getMembers} from "@/api/Member";
+  import {
+    addMember,
+    addMemberRole,
+    changeMemberSuperior,
+    deleteMember,
+    deleteMemberRole,
+    getMembers
+  } from "@/api/Member";
 import {getAllUser} from "@/api/user";
 
 export default {
@@ -121,7 +130,7 @@ export default {
       displayedMemberList: [],
       memberList: [],
       memberListByRole: [],
-      memberCountByRole: [0, 0, 0, 0, 0, 0, 0],
+      memberCountByRole: [0, 0, 0, 0, 0, 0, 0, 0, 0],
       addUserFormTitle: '新增项目成员',
       allUsers: [
         { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
@@ -143,8 +152,7 @@ export default {
         superiorID: null,
         memberID: null
       },
-      memberRoleList: ["QA", "QALeader", "开发", "开发Leader", "EPG"],
-      memberRoleTypeList: ["项目经理", "QA", "QALeader", "开发", "开发Leader", "EPG"],
+      memberRoleTypeList: ["项目经理", "QA", "QALeader", "开发", "开发Leader", "EPG", "测试", "资产管理者"],
       currentTab: "0"
     };
   },
@@ -244,7 +252,12 @@ export default {
     },
     deleteMember(row) {
       if (this.currentTab === "0") {
-
+        deleteMember(
+          this.$store.state.project.currentProjectId,
+          row.memberID,
+        ).then(res => {
+          this.getMembers();
+        })
       } else {
         deleteMemberRole(
           this.$store.state.project.currentProjectId,

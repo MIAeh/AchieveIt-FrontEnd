@@ -20,6 +20,18 @@ export function deleteFeature(featureID) {
   })
 }
 
+export function updateFeatureByFeatureID(featureID, featureName, featureDescription) {
+  return request({
+    url: '/feature/updateFeatureByFeatureID',
+    method: 'post',
+    params: {
+      featureID: featureID,
+      featureName: featureName,
+      featureDescription: featureDescription
+    }
+  })
+}
+
 export function createFeature(featureInfo) {
   if (featureInfo.featureLevel === 0) {
     return request({
