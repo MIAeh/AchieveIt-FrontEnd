@@ -180,6 +180,7 @@
                   <el-button
                     type="text"
                     v-show="index && !editMode"
+                    class="btn-text-red"
                     @click.prevent="removeDomain(milestone)"
                   >删除</el-button>
                 </el-col>
@@ -293,6 +294,14 @@ export default {
   &-row {
     margin-bottom: 10px;
   }
+}
+.btn-text-red {
+  color: #f56c6c;
+  float: none;
+}
+.btn-text-red:focus,
+.btn-text-red:hover {
+  color: #f78989;
 }
 .box-card-left {
   margin: 10px 10px 10px 0;

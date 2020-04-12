@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container authority">
     <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabRoute">
       <el-tab-pane label="基本信息" name="basicInfo"></el-tab-pane>
       <el-tab-pane label="状态管理" name="stateManage"></el-tab-pane>
@@ -16,21 +16,33 @@
             <div class="tip">允许成员读写项目Git库</div>
             <div v-for="(item,index) in userListGit" :key="index" class="text item">
               {{item.memberName}}，{{ item.memberRoleString ? item.memberRoleString : '无'}}，{{item.memberMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('Git', item.memberID)">删除</el-button>
+              <el-button
+                type="text"
+                class="btn-text-red"
+                @click="handleDelete('Git', item.memberID)"
+              >删除</el-button>
             </div>
           </el-collapse-item>
           <el-collapse-item title="文件服务器权限" name="2">
             <div class="tip">允许成员读写项目文件服务器</div>
             <div v-for="(item,index) in userListFile" :key="index" class="text item">
               {{item.memberName}}，{{ item.memberRoleString ? item.memberRoleString : '无'}}，{{item.memberMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('File', item.memberID)">删除</el-button>
+              <el-button
+                type="text"
+                class="btn-text-red"
+                @click="handleDelete('File', item.memberID)"
+              >删除</el-button>
             </div>
           </el-collapse-item>
           <el-collapse-item title="邮件通知权限" name="3">
             <div class="tip">管理成员接收通知邮件权限</div>
             <div v-for="(item,index) in userListMail" :key="index" class="text item">
               {{item.memberName}}，{{ item.memberRoleString ? item.memberRoleString : '无'}}，{{item.memberMail}}
-              <el-button type="text" class="btn-text-red" @click="handleDelete('Mail', item.memberID)">删除</el-button>
+              <el-button
+                type="text"
+                class="btn-text-red"
+                @click="handleDelete('Mail', item.memberID)"
+              >删除</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>
@@ -73,8 +85,12 @@
 </template>
 
 <script>
-  import {addAuthority, deleteAuthority, getAllMembersByAuthority} from "@/api/authority";
-import {getMembers} from "@/api/Member";
+import {
+  addAuthority,
+  deleteAuthority,
+  getAllMembersByAuthority
+} from "@/api/authority";
+import { getMembers } from "@/api/Member";
 
 export default {
   data() {
@@ -91,7 +107,14 @@ export default {
       userListGit: [],
       userListFile: [],
       userListMail: [],
-      memberRoleTypeList: ["项目经理", "QA", "QALeader", "开发", "开发Leader", "EPG"]
+      memberRoleTypeList: [
+        "项目经理",
+        "QA",
+        "QALeader",
+        "开发",
+        "开发Leader",
+        "EPG"
+      ]
     };
   },
   created() {
@@ -102,28 +125,38 @@ export default {
     getAllMembers() {
       getMembers(this.$store.state.project.currentProjectId, -1).then(res => {
         const { data } = res;
-        this.allMemberList = data.map( member => this.convertRoleToRoleString(member) );
-      })
+        this.allMemberList = data.map(member =>
+          this.convertRoleToRoleString(member)
+        );
+      });
     },
     getAllAuthority() {
-      getAllMembersByAuthority(this.$store.state.project.currentProjectId).then(res => {
-        const { data } = res;
-        this.userListFile = data.file.map( member => this.convertRoleToRoleString(member) );
-        this.userListGit = data.git.map( member => this.convertRoleToRoleString(member) );
-        this.userListMail = data.mail.map( member => this.convertRoleToRoleString(member) );
-      })
+      getAllMembersByAuthority(this.$store.state.project.currentProjectId).then(
+        res => {
+          const { data } = res;
+          this.userListFile = data.file.map(member =>
+            this.convertRoleToRoleString(member)
+          );
+          this.userListGit = data.git.map(member =>
+            this.convertRoleToRoleString(member)
+          );
+          this.userListMail = data.mail.map(member =>
+            this.convertRoleToRoleString(member)
+          );
+        }
+      );
     },
     convertRoleToRoleString(member) {
       const { memberRole } = member;
       let roleString = "";
       for (let j = 0; j < memberRole.length; j++) {
-        roleString = roleString + this.memberRoleTypeList[ memberRole[j] ];
+        roleString = roleString + this.memberRoleTypeList[memberRole[j]];
         if (j !== memberRole.length - 1) {
           roleString = roleString + "、";
         }
       }
       member.memberRoleString = roleString;
-      return member
+      return member;
     },
     handleTabRoute(tab, event) {
       this.$router.push(`/projectInfo/${tab.name}`);
@@ -140,11 +173,13 @@ export default {
         this.$store.state.project.currentProjectId,
         this.addForm.users,
         this.addForm.type
-      ).then(res => {
-        this.getAllAuthority();
-        this.addFormVisible = false;
-      }).catch(error => {
-          console.log(error.response)
+      )
+        .then(res => {
+          this.getAllAuthority();
+          this.addFormVisible = false;
+        })
+        .catch(error => {
+          console.log(error.response);
         });
     },
     handleDelete(type, memberID) {
@@ -158,7 +193,7 @@ export default {
             type
           ).then(res => {
             this.getAllAuthority();
-          })
+          });
         })
         .catch(() => {});
     }
@@ -172,13 +207,15 @@ export default {
     margin-bottom: 10px;
   }
 }
-.btn-text-red {
-  color: #f56c6c;
-  float: right;
-}
-.btn-text-red:focus,
-.btn-text-red:hover {
-  color: #f78989;
+.authority {
+  .btn-text-red {
+    color: #f56c6c;
+    float: right;
+  }
+  .btn-text-red:focus,
+  .btn-text-red:hover {
+    color: #f78989;
+  }
 }
 .el-collapse-item__header {
   font-size: 20px;

@@ -55,6 +55,7 @@
                 @click.native.prevent="deleteFeature(scope.row)"
                 type="text"
                 size="small"
+                class="btn-text-red"
               >删除</el-button>
             </template>
           </el-table-column>
@@ -68,7 +69,12 @@
     </el-tabs>
 
     <el-dialog title="新建功能" :visible.sync="createFunctionDialogVisible">
-      <el-form ref="newFunction" :model="newFunction" label-position="top" :rules="newFunctionRules">
+      <el-form
+        ref="newFunction"
+        :model="newFunction"
+        label-position="top"
+        :rules="newFunctionRules"
+      >
         <el-form-item label="标题" prop="featureName">
           <el-input v-model="newFunction.featureName"></el-input>
         </el-form-item>
@@ -147,7 +153,13 @@
 </template>
 
 <script>
-import { createFeature, deleteFeature, getFeature, uploadFeatureList, updateFeatureByFeatureID } from "@/api/feature";
+import {
+  createFeature,
+  deleteFeature,
+  getFeature,
+  uploadFeatureList,
+  updateFeatureByFeatureID
+} from "@/api/feature";
 import EleImport from "vue-ele-import";
 
 export default {
@@ -284,7 +296,7 @@ export default {
     },
     getFunctionInfo(row, column) {
       this.functionInfo = row;
-      if (column.label !== "操作"){
+      if (column.label !== "操作") {
         this.functionInfoDialogVisible = true;
       }
     },
@@ -310,18 +322,24 @@ export default {
       });
     },
     deleteFeature(row) {
-      deleteFeature(row.featureId).then(res => {
-        this.getFeature();
-      });
+      this.$confirm("确认删除吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          deleteFeature(row.featureId).then(res => {
+            this.getFeature();
+          });
+        })
+        .catch(() => {});
     },
     updateFeature() {
       updateFeatureByFeatureID(
         this.functionInfo.featureId,
         this.functionInfo.featureName,
-        this.functionInfo.featureDescription,
+        this.functionInfo.featureDescription
       ).then(res => {
         this.getFeature();
-      })
+      });
     },
     handleFeatureLevelChange(value) {
       if (value === 0) {
@@ -336,23 +354,21 @@ export default {
       // 演示代码
       // 1、如果没有针对ele-import做过接口约定, 可以采用如下形式:
       try {
-        debugger
-        const res = await uploadFeatureList({'data': data});
+        debugger;
+        const res = await uploadFeatureList({ data: data });
         this.getFeature();
-        return Promise.resolve()
+        return Promise.resolve();
       } catch (error) {
         // error经过一系列转化, 转为
-        const errorData = this.getErrorMessage(error)
+        const errorData = this.getErrorMessage(error);
         // {0:{ age: '年龄为数字', city: '城市必填'}, 2:{ age: '年龄为数字'} } // 0 和 2 分别是行号
-        return Promise.reject(errorData)
+        return Promise.reject(errorData);
       }
       // 2、如果针对ele-import做过接口约定, 当校检错误时, 后端返回的 error 就是上述错误形式, 则可直接
       // return axios.post('/user', data)
       // 总结: 无论如何总要返回一个Promise对象
     },
-    getErrorMessage() {
-
-    },
+    getErrorMessage() {},
     handleCloseImport() {
       console.log("弹窗关闭了~");
     },
@@ -442,6 +458,14 @@ export default {
   &-row {
     margin-bottom: 10px;
   }
+}
+.btn-text-red {
+  color: #f56c6c;
+  float: none;
+}
+.btn-text-red:focus,
+.btn-text-red:hover {
+  color: #f78989;
 }
 .box-card-left {
   margin: 10px 10px 10px 0;
