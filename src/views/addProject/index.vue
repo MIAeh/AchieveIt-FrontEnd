@@ -336,9 +336,7 @@ export default {
         "PHP",
         "Go"
       ],
-      allUsers: [
-        { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
-      ],
+      allUsers: [],
       domainList: [],
       allProjectID: [],
       loading: false,
