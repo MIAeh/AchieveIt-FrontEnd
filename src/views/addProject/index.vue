@@ -388,7 +388,8 @@ export default {
         featureLevel: 0,
         firstFather: "",
         secondFather: "",
-        featureDescription: ""
+        featureDescription: "",
+        projectID: ""
       },
       newFunctionRules: {
         featureName: [{ required: true, message: "请输入标题" }],
@@ -460,7 +461,6 @@ export default {
       getAllUser().then(res => {
         const { data } = res;
         this.allUsers = data;
-        console.log(data);
       });
     },
     getDomainList() {
@@ -470,6 +470,20 @@ export default {
       })
     },
     createProject() {
+      delete this.form.client_contact_name;
+      delete this.form.client_company;
+      console.log(this.form)
+      if(this.form.projectFunctions) {
+        this.form.projectFunctions.map(item => {
+          if(item.featureLevel == 0) item.fatherFeatureName = '';
+          else if(item.featureLevel == 1) item.fatherFeatureName = item.firstFather;
+          else item.fatherFeatureName = item.secondFather;
+          delete item.firstFather;
+          delete item.secondFather;
+        })
+      }
+      console.log(this.form)
+      debugger
       createProject(this.form).then(res => {
         console.log(res);
         // this.$router.push("/projectList");
@@ -501,12 +515,14 @@ export default {
       });
     },
     showCreateFunctionDialog() {
+      const projectID = this.form.projectID;
       this.newFunction = {
         featureName: "",
         featureLevel: 0,
         firstFather: "",
         secondFather: "",
-        description: ""
+        featureDescription: "",
+        projectID: projectID
       };
       this.createFunctionDialogVisible = true;
     },
