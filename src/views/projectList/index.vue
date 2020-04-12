@@ -23,8 +23,12 @@
           </el-table-column>
           <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
+          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
+          </el-table-column>
+          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
+          </el-table-column>
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
@@ -34,8 +38,12 @@
           <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
           <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
+          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
+          </el-table-column>
+          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
+          </el-table-column>
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
@@ -45,8 +53,12 @@
           <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
           <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
+          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
+          </el-table-column>
+          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
+          </el-table-column>
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
@@ -56,8 +68,12 @@
           <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
           <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
           <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180" />
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180" />
+          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
+          </el-table-column>
+          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
+            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
+          </el-table-column>
           <el-table-column prop="projectClientContactName" label="客户名称" />
         </el-table>
       </el-tab-pane>
@@ -90,6 +106,19 @@ export default {
   filters: {
     formatProjectStatus(val) {
       return 0 ? "未开始" : 1 ? "进行中" : 2 ? "已完成" : val;
+    },
+    formatDateString(timeString) {
+      const date = new Date(timeString);
+      let year = date.getFullYear();//获取完整的年份(4位,1970-????)
+      let month = date.getMonth() + 1;//获取当前月份(0-11,0代表1月)
+      let day = date.getDate();//获取当前日(1-31)
+      if (month < 10) {
+        month ="0" + month;
+      }
+      if (day < 10) {
+        day ="0" + day;
+      }
+      return  year +"-" + month + "-" + day;
     }
   },
   methods: {

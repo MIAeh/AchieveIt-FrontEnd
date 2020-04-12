@@ -22,7 +22,7 @@ export function deleteFeature(featureID) {
 
 export function updateFeatureByFeatureID(featureID, featureName, featureDescription) {
   return request({
-    url: '/feature/deleteFeatureByFeatureID',
+    url: '/feature/updateFeatureByFeatureID',
     method: 'get',
     params: {
       featureID: featureID,
