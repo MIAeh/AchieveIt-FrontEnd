@@ -273,7 +273,6 @@ export default {
       });
     },
     rejectApplication() {
-      this.activeStatus = 6;
       rejectApplication(this.projectID).then(res => {
         if (res.errorCode == "200") this.getProjectStatus();
       });
