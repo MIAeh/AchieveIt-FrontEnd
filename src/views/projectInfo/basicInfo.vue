@@ -117,6 +117,25 @@
                   </el-form-item>
                 </el-col>
               </el-row>
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="业务领域">
+                    <el-select
+                      v-model="form.domain"
+                      style="width: 100%"
+                      placeholder="请选择"
+                      :disabled="editMode"
+                    >
+                      <el-option
+                        v-for="item in domainList"
+                        :key="item.domain"
+                        :label="item.domainContent"
+                        :value="item.domain"
+                      ></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </el-card>
           </el-col>
           <el-col :span="12">
@@ -178,7 +197,11 @@
 </template>
 
 <script>
-import { getProjectInfo, updateProjectInfo } from "@/api/project";
+import {
+  getProjectInfo,
+  updateProjectInfo,
+  getDomainList
+} from "@/api/project";
 
 export default {
   name: "BasicInfo",
@@ -202,7 +225,8 @@ export default {
           }
         ],
         projectLanguages: [],
-        projectFrameworks: ""
+        projectFrameworks: "",
+        domain: ""
       },
       editMode: true,
       languagesList: [
@@ -214,13 +238,21 @@ export default {
         "Python",
         "PHP",
         "Go"
-      ]
+      ],
+      domainList: []
     };
   },
   created() {
     this.getProjectInfo();
+    this.getDomainList();
   },
   methods: {
+    getDomainList() {
+      getDomainList().then(res => {
+        const { data } = res;
+        this.domainList = data;
+      });
+    },
     getProjectInfo() {
       this.form.projectID = this.$store.state.project.currentProjectId;
       getProjectInfo(this.form.projectID).then(response => {

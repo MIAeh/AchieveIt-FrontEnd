@@ -55,3 +55,11 @@ export function createFeature(featureInfo) {
     })
   }
 }
+
+export function uploadFeatureList(data) {
+  return request({
+    url: '/feature/uploadFeatureList',
+    method: 'post',
+    data: data
+  })
+}
