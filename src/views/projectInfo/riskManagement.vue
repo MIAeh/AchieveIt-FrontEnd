@@ -37,7 +37,7 @@
           </el-table-column>
           <el-table-column prop="riskStatus" label="风险状态" width="140">
             <template slot-scope="scope">
-              <el-tag type="success" v-if="scope.row.riskStatus === '1'">已解决</el-tag>
+              <el-tag type="success" v-if="scope.row.riskStatus == '1'">已解决</el-tag>
               <el-tag type="danger" v-else>处理中</el-tag>
             </template>
           </el-table-column>
