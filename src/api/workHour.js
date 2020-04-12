@@ -54,7 +54,6 @@ export function updateWorkHour(workHourID, featureName, activityName, startTime,
       activityName: activityName,
       startTime: startTime,
       endTime: endTime,
-      projectID: projectID
     }
   })
 }
