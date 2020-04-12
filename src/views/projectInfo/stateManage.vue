@@ -227,7 +227,6 @@ export default {
   },
   mounted() {
     this.getProjectStatus();
-    this.getArchiveLink();
   },
   methods: {
     handleTabRoute(tab, event) {
@@ -252,6 +251,9 @@ export default {
         }
         if (this.activeStatus > 2 || this.projectSubStatus.allocatedEPG) {
           this.setEPGStatus = "finish";
+        }
+        if(this.activeStatus == 5) {
+          this.getArchiveLink();
         }
       });
     },

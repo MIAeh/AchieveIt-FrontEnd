@@ -7,11 +7,15 @@
       <el-tab-pane label="成员管理" name="memberManage">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">{{ addUserFormTitle }}</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              @click="handleAddUser"
+            >{{ addUserFormTitle }}</el-button>
           </el-col>
         </el-row>
         <el-tabs type="card" @tab-click="handleRoleTabChange">
-          <el-tab-pane :label="'项目成员('+memberCountByRole[0]+')'" ></el-tab-pane>
+          <el-tab-pane :label="'项目成员('+memberCountByRole[0]+')'"></el-tab-pane>
           <el-tab-pane :label="'项目经理('+memberCountByRole[1]+')'"></el-tab-pane>
           <el-tab-pane :label="'QA('+memberCountByRole[2]+')'"></el-tab-pane>
           <el-tab-pane :label="'QALeader('+memberCountByRole[3]+')'"></el-tab-pane>
@@ -32,13 +36,13 @@
                 @click.native.prevent="deleteMember(scope.row)"
                 type="text"
                 size="small"
+                class="btn-text-red"
               >删除</el-button>
               <el-button
                 type="text"
                 size="small"
-                @click.native="handleChangeSuperior(scope.row)">
-                编辑上级
-              </el-button>
+                @click.native="handleChangeSuperior(scope.row)"
+              >编辑上级</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -70,7 +74,6 @@
               ></el-option>
             </el-select>
           </el-form-item>
-
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -107,20 +110,19 @@
         <el-button type="primary" @click="changeSuperior">提交</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-  import {
-    addMember,
-    addMemberRole,
-    changeMemberSuperior,
-    deleteMember,
-    deleteMemberRole,
-    getMembers
-  } from "@/api/Member";
-import {getAllUser} from "@/api/user";
+import {
+  addMember,
+  addMemberRole,
+  changeMemberSuperior,
+  deleteMember,
+  deleteMemberRole,
+  getMembers
+} from "@/api/Member";
+import { getAllUser } from "@/api/user";
 
 export default {
   name: "AddProject",
@@ -131,7 +133,7 @@ export default {
       memberList: [],
       memberListByRole: [],
       memberCountByRole: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      addUserFormTitle: '新增项目成员',
+      addUserFormTitle: "新增项目成员",
       allUsers: [
         { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
       ],
@@ -152,7 +154,16 @@ export default {
         superiorID: null,
         memberID: null
       },
-      memberRoleTypeList: ["项目经理", "QA", "QALeader", "开发", "开发Leader", "EPG", "测试", "资产管理者"],
+      memberRoleTypeList: [
+        "项目经理",
+        "QA",
+        "QALeader",
+        "开发",
+        "开发Leader",
+        "EPG",
+        "测试",
+        "资产管理者"
+      ],
       currentTab: "0"
     };
   },
@@ -162,13 +173,12 @@ export default {
   methods: {
     getMembers() {
       getMembers(this.$store.state.project.currentProjectId, -1).then(res => {
-
         const { data } = res;
         for (let i = 0; i < data.length; i++) {
           const { memberRole } = data[i];
           let roleString = "";
           for (let j = 0; j < memberRole.length; j++) {
-            roleString = roleString + this.memberRoleTypeList[ memberRole[j] ];
+            roleString = roleString + this.memberRoleTypeList[memberRole[j]];
             if (j !== memberRole.length - 1) {
               roleString = roleString + "、";
             }
@@ -193,17 +203,18 @@ export default {
         }
 
         this.showCurrentMemberList();
-      })
+      });
     },
     showCurrentMemberList() {
-      if (this.currentTab === "0"){  //项目成员
+      if (this.currentTab === "0") {
+        //项目成员
         this.displayedMemberList = this.memberList;
       } else {
         this.displayedMemberList = this.memberListByRole[this.currentTab - 1];
       }
     },
     handleRoleTabChange(tab) {
-      this.addUserFormTitle = '新增' + tab.label.split('(')[0];
+      this.addUserFormTitle = "新增" + tab.label.split("(")[0];
       this.currentTab = tab.index;
       this.showCurrentMemberList();
     },
@@ -211,14 +222,15 @@ export default {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
     handleAddUser() {
-      if (this.currentTab === "0") { //项目成员
+      if (this.currentTab === "0") {
+        //项目成员
         this.getAllUser();
       } else {
         this.addUserList = this.memberList.map(member => {
           return {
             userId: member.memberID,
             userName: member.memberName
-          }
+          };
         });
       }
       this.addUserFormVisible = true;
@@ -229,18 +241,22 @@ export default {
     },
     addMember() {
       if (this.currentTab === "0") {
-        addMember(this.$store.state.project.currentProjectId, this.addUserForm.userID).then(res => {
+        addMember(
+          this.$store.state.project.currentProjectId,
+          this.addUserForm.userID
+        ).then(res => {
           this.getMembers();
           this.addUserFormVisible = false;
-        })
+        });
       } else {
         addMemberRole(
           this.$store.state.project.currentProjectId,
           this.addUserForm.userID,
-          this.currentTab-1).then(res => {
+          this.currentTab - 1
+        ).then(res => {
           this.getMembers();
           this.addUserFormVisible = false;
-        })
+        });
       }
     },
     getAllUser() {
@@ -248,42 +264,48 @@ export default {
         const { data } = res;
         this.allUsers = data;
         this.addUserList = this.allUsers;
-      })
+      });
     },
     deleteMember(row) {
-      if (this.currentTab === "0") {
-        deleteMember(
-          this.$store.state.project.currentProjectId,
-          row.memberID,
-        ).then(res => {
-          this.getMembers();
+      this.$confirm("确认删除吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          if (this.currentTab === "0") {
+            deleteMember(
+              this.$store.state.project.currentProjectId,
+              row.memberID
+            ).then(res => {
+              this.getMembers();
+            });
+          } else {
+            deleteMemberRole(
+              this.$store.state.project.currentProjectId,
+              row.memberID,
+              this.currentTab - 1
+            ).then(res => {
+              this.getMembers();
+            });
+          }
         })
-      } else {
-        deleteMemberRole(
-          this.$store.state.project.currentProjectId,
-          row.memberID,
-          this.currentTab-1)
-          .then(res => {
-          this.getMembers();
-        })
-      }
+        .catch(() => {});
     },
     handleChangeSuperior(row) {
       this.changeSuperiorVisible = true;
       this.changeSuperiorForm = {
         superiorID: null,
         memberID: row.memberID
-      }
+      };
     },
     changeSuperior() {
       changeMemberSuperior(
         this.$store.state.project.currentProjectId,
         this.changeSuperiorForm.memberID,
-        this.changeSuperiorForm.superiorID)
-        .then(res => {
-          this.changeSuperiorVisible = false;
-          this.getMembers();
-        })
+        this.changeSuperiorForm.superiorID
+      ).then(res => {
+        this.changeSuperiorVisible = false;
+        this.getMembers();
+      });
     }
   }
 };
@@ -294,6 +316,14 @@ export default {
   &-row {
     margin-bottom: 10px;
   }
+}
+.btn-text-red {
+  color: #f56c6c;
+  float: none;
+}
+.btn-text-red:focus,
+.btn-text-red:hover {
+  color: #f78989;
 }
 .box-card-left {
   margin: 10px 10px 10px 0;
