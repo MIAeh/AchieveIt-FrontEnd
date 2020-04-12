@@ -374,7 +374,7 @@ export default {
             });
           } else {
             updateWorkHour(
-              this.workHourForm.projectId,
+              this.workHourForm.workHourId,
               this.workHourForm.featureName,
               this.workHourForm.activityName,
               this.workHourForm.startTime,
