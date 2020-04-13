@@ -11,7 +11,10 @@
       <el-tab-pane label="风险管理" name="riskManagement">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk">登记风险</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk"
+                       v-if="this.$store.state.user.memberRole.includes(0)">
+              登记风险
+            </el-button>
           </el-col>
           <el-col :span="4" :offset="16">
             <el-button
@@ -19,6 +22,7 @@
               icon="el-icon-download"
               style="float:right"
               @click="importFormVisible = true"
+              v-if="this.$store.state.user.memberRole.includes(0)">
             >导入风险</el-button>
           </el-col>
         </el-row>
@@ -41,7 +45,8 @@
               <el-tag type="danger" v-else>处理中</el-tag>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="120">
+          <el-table-column fixed="right" label="操作" width="120"
+                           v-if="this.$store.state.user.memberRole.includes(0)">
             <template slot-scope="scope">
               <el-button
                 @click.stop="handlePass(scope.row)"
@@ -125,7 +130,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">提交</el-button>
+        <el-button type="primary" @click="handleSubmit"
+                   v-if="this.$store.state.user.memberRole.includes(0)">
+          提交
+        </el-button>
       </div>
     </el-dialog>
 

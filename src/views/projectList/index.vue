@@ -3,7 +3,9 @@
     <el-tabs v-model="currentTabName" type="border-card" @tab-click="handleTabsClick">
       <el-row class="dashboard-row">
         <el-col :span="4">
-          <el-button type="primary" icon="el-icon-plus" @click="handleAddProject">新建项目</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleAddProject"
+                     v-if="this.$store.state.user.role === 0">
+            新建项目</el-button>
         </el-col>
         <el-col :span="8" :offset="12">
           <el-input

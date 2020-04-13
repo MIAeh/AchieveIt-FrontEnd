@@ -9,7 +9,10 @@
       <el-tab-pane label="工时管理" name="workHour">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour">申报工时</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour"
+                       v-if="this.$store.state.user.isMember === true">
+              申报工时
+            </el-button>
           </el-col>
           <el-col :span="2" :offset="18">
             <el-dropdown class="dropdown-status" @command="handleStatusChange">

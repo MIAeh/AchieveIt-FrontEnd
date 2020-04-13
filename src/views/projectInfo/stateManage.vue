@@ -5,7 +5,7 @@
       <el-tab-pane label="状态管理" name="stateManage">
         <el-row class="dashboard-row-stateManage">
           <div style="float:right">
-            <el-popover width="240" v-model="visible" v-if="activeStatus === 1">
+            <el-popover width="240" v-model="visible" v-if="activeStatus === 1 && this.$store.state.user.isMonitor === true">
               <p>请仔细确认申请立项的项目信息，如同意立项，请选择“同意立项”；如需修改，请选择“驳回立项”。</p>
               <div style="text-align: right; margin: 0">
                 <el-button
@@ -21,7 +21,7 @@
             <el-popover
               width="240"
               v-model="visible"
-              v-else-if="activeStatus === 2 && setBasicStatus === 'finish' && setQAStatus === 'finish' && setEPGStatus === 'finish'"
+              v-else-if="activeStatus === 2 && setBasicStatus === 'finish' && setQAStatus === 'finish' && setEPGStatus === 'finish' && this.$store.state.user.memberRole.includes(0)"
             >
               <p>是否确认项目基本配置已完成，正式启动项目？</p>
               <p>-人员信息设定完成</p>
@@ -31,14 +31,14 @@
               </div>
               <el-button slot="reference">启动项目</el-button>
             </el-popover>
-            <el-popover width="240" v-model="visible" v-else-if="activeStatus === 3">
+            <el-popover width="240" v-model="visible" v-else-if="activeStatus === 3 && this.$store.state.user.memberRole.includes(0)">
               <p>是否确认项目已成功交付，将项目状态设置为“已交付”？</p>
               <div style="text-align: right; margin: 0">
                 <el-button type="text" class="btn-text-green" @click="deliverProject()">确认交付</el-button>
               </div>
               <el-button slot="reference">确认交付</el-button>
             </el-popover>
-            <el-popover width="240" v-model="visible" v-else-if="activeStatus === 4">
+            <el-popover width="240" v-model="visible" v-else-if="activeStatus === 4 && this.$store.state.user.memberRole.includes(0)">
               <p>是否确认项目已结束，将项目状态设置为“结束”？</p>
               <div style="text-align: right; margin: 0">
                 <el-button type="text" class="btn-text-green" @click="endProject()">确认结束</el-button>
@@ -48,7 +48,7 @@
             <el-popover
               width="240"
               v-model="visible"
-              v-else-if="activeStatus === 5 && projectSubStatus.archived"
+              v-else-if="activeStatus === 5 && projectSubStatus.archived && this.$store.state.user.role === 4"
             >
               <p>
                 归档资料链接：
@@ -66,7 +66,8 @@
               </div>
               <el-button slot="reference">审批归档</el-button>
             </el-popover>
-            <el-button v-if="activeStatus === 5 && !projectSubStatus.archived" @click="setArchivedLink">申请归档</el-button>
+            <el-button v-if="activeStatus === 5 && !projectSubStatus.archived && this.$store.state.user.memberRole.includes(0)"
+                       @click="setArchivedLink">申请归档</el-button>
           </div>
         </el-row>
         <el-row class="dashboard-row-stateManage">
@@ -91,7 +92,7 @@
                           width="240"
                           placement="right"
                           v-model="setVisible"
-                          v-if="setBasicStatus != 'finish'"
+                          v-if="setBasicStatus != 'finish' && role === 4"
                         >
                           <p>是否确认项目配置已完成？</p>
                           <p>-Github仓库配置</p>
@@ -108,7 +109,7 @@
                         <el-button
                           size="mini"
                           type="text"
-                          v-if="setQAStatus != 'finish'"
+                          v-if="setQAStatus != 'finish' && role === 3"
                           @click="setQA()"
                         >分配QA</el-button>
                       </template>
@@ -118,7 +119,7 @@
                         <el-button
                           size="mini"
                           type="text"
-                          v-if="setEPGStatus != 'finish'"
+                          v-if="setEPGStatus != 'finish' && role === 2"
                           @click="setEPG()"
                         >分配EPG</el-button>
                       </template>
@@ -201,6 +202,7 @@ import { getAllUser } from "@/api/user";
 export default {
   data() {
     return {
+      role: '',
       activeTabName: "stateManage",
       projectID: "",
       activeStatus: 1,
@@ -224,6 +226,9 @@ export default {
       },
       allUserList: []
     };
+  },
+  created() {
+    this.role = this.$store.state.user.role;
   },
   mounted() {
     this.getProjectStatus();
