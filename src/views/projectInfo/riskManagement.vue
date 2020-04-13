@@ -12,7 +12,7 @@
         <el-row class="dashboard-row">
           <el-col :span="4">
             <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk"
-                       v-if="this.$store.state.user.memberRole.includes(0)">
+                       v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
               登记风险
             </el-button>
           </el-col>
@@ -22,7 +22,7 @@
               icon="el-icon-download"
               style="float:right"
               @click="importFormVisible = true"
-              v-if="this.$store.state.user.memberRole.includes(0)">
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             >导入风险</el-button>
           </el-col>
         </el-row>
@@ -46,7 +46,7 @@
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="120"
-                           v-if="this.$store.state.user.memberRole.includes(0)">
+                           v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             <template slot-scope="scope">
               <el-button
                 @click.stop="handlePass(scope.row)"
@@ -131,7 +131,7 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
         <el-button type="primary" @click="handleSubmit"
-                   v-if="this.$store.state.user.memberRole.includes(0)">
+                   v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
           提交
         </el-button>
       </div>

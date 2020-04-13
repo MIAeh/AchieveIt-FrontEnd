@@ -10,7 +10,7 @@
         <el-row class="dashboard-row">
           <el-col :span="4">
             <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour"
-                       v-if="this.$store.state.user.isMember === true">
+                       v-if="this.$store.state.user.isMember === true && this.$store.state.project.status != 5 && this.$store.state.project.status > 1">
               申报工时
             </el-button>
           </el-col>
@@ -64,14 +64,14 @@
         label-position="center"
         :disabled="formDisabled"
       >
-        <el-row>
+        <el-row v-if="formTitle !== '登记工时记录'">
           <el-col :span="12">
             <el-form-item label="申报日期">
               <el-input v-model="workHourForm.applyTime" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row v-if="formTitle !== '登记工时记录'">
           <el-col :span="12">
             <el-form-item label="申报人">
               <el-input v-model="workHourForm.applyerName" :readonly="true"></el-input>
@@ -127,9 +127,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'">保存</el-button>
-        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'">驳回</el-button>
-        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'">批准</el-button>
+        <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'"
+                   v-if="this.$store.state.project.status != 5">
+          保存
+        </el-button>
+        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'"
+                   v-if="this.$store.state.project.status != 5">驳回</el-button>
+        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'"
+                   v-if="this.$store.state.project.status != 5">批准</el-button>
       </div>
     </el-dialog>
   </div>
