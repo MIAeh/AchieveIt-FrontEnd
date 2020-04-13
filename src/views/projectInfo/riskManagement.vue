@@ -48,6 +48,7 @@
                 type="text"
                 size="small"
                 class="btn-text-green"
+                v-if="scope.row.riskStatus != '1'"
               >确认解决</el-button>
               <el-button
                 @click.stop="handleDelete(scope.row)"
@@ -62,7 +63,7 @@
     </el-tabs>
 
     <el-dialog :title="dialogTitle" :visible.sync="addFormVisible">
-      <el-form :model="addForm" label-width="100px" label-position="center">
+      <el-form :model="addForm" :disabled="formDisable" label-width="100px" label-position="center">
         <el-row>
           <el-form-item label="风险描述">
             <el-input v-model="addForm.riskDescription"></el-input>
@@ -257,6 +258,11 @@ export default {
       }
     },
   },
+  computed: {
+    formDisable() {
+      return this.dialogTitle === '风险详情';
+    },
+  },
   created() {
     this.getRisk();
   },
@@ -306,13 +312,19 @@ export default {
         this.addRisk();
       } else if (this.dialogTitle === "编辑风险") {
         this.updateRisk();
+      } else {
+        this.addFormVisible = false;
       }
     },
     handleEdit(row) {
       this.getMemberList();
       this.addFormVisible = true;
       this.addForm = { ...row };
-      this.dialogTitle = "编辑风险";
+      if (row.riskStatus == '1') {
+        this.dialogTitle = "风险详情";
+      } else {
+        this.dialogTitle = "编辑风险";
+      }
     },
     handleImportTypeChange() {
       if (this.importForm.importType === "标准风险库") {
