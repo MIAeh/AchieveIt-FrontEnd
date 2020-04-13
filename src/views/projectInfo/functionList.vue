@@ -225,7 +225,7 @@ export default {
         featureDescription: ""
       },
       newFunctionRules: {
-        featureName: [{ required: true, message: "请输入标题" }],
+        featureName: [{ required: true, message: "请输入标题", trigger: " blur" }],
         firstFather: [
           { validator: validateFirstFather, trigger: "change, blur" }
         ],
@@ -322,7 +322,8 @@ export default {
       });
     },
     deleteFeature(row) {
-      this.$confirm("确认删除吗?", "提示", {
+      const text = row.allChildren ? '删除该功能时会同时删除其子功能，确认删除？' : '确认删除该功能吗？';
+      this.$confirm(text, "提示", {
         type: "warning"
       })
         .then(() => {
@@ -338,6 +339,7 @@ export default {
         this.functionInfo.featureName,
         this.functionInfo.featureDescription
       ).then(res => {
+        this.functionInfoDialogVisible = false
         this.getFeature();
       });
     },
@@ -385,7 +387,6 @@ export default {
           "功能描述",
           "创建时间",
           "功能类型",
-          "父功能名称",
           "父功能ID"
         ];
         const filterVal = [
@@ -395,7 +396,6 @@ export default {
           "featureDescription",
           "createTime",
           "featureLevel",
-          "fatherName",
           "fatherId"
         ];
         const list = this.treeToList(this.functions);

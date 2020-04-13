@@ -144,30 +144,13 @@ export default {
       activeTabName: "workHour",
       applyStatus: "all",
       showWorkHourList: [],
-      workHourList: [
-        {
-          workHourId: "00003",
-          applyTime: "2020-03-20",
-          applyerName: "张三",
-          approverName: "李四",
-          featureName: "添加成员",
-          status: "0"
-        },
-        {
-          workHourId: "00003",
-          applyTime: "2020-03-20",
-          applyerName: "张三",
-          approverName: "李四",
-          featureName: "添加成员",
-          status: "0"
-        }
-      ],
+      workHourList: [],
       newApply: false,
       workHourFormVisible: false,
       workHourForm: {
-        applyTime: "2020-03-20",
-        applyerName: "张三",
-        approverName: "李四",
+        applyTime: "",
+        applyerName: "",
+        approverName: "",
         featureName: "",
         dateTime: "",
         activityName: ""

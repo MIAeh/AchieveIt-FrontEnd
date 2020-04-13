@@ -390,7 +390,7 @@ export default {
         projectID: ""
       },
       newFunctionRules: {
-        featureName: [{ required: true, message: "请输入标题" }],
+        featureName: [{ required: true, message: "请输入标题", trigger: " blur" }],
         firstFather: [
           { validator: validateFirstFather, trigger: "change, blur" }
         ],
