@@ -1,11 +1,17 @@
 import { login, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import {getMembers} from "@/api/Member";
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
+    role: '',
+    isMonitor: false,
+    isMember: false,
+    memberRole: [],
+    id: '',
     avatar: ''
   }
 }
@@ -21,6 +27,21 @@ const mutations = {
   },
   SET_NAME: (state, name) => {
     state.name = name
+  },
+  SET_ROLE: (state, role) => {
+    state.role = role
+  },
+  SET_IS_MONITOR: (state, isMonitor) => {
+    state.isMonitor = isMonitor
+  },
+  SET_IS_MEMBER: (state, isMember) => {
+    state.isMember = isMember
+  },
+  SET_MEMBER_ROLE: (state, memberRole) => {
+    state.memberRole = memberRole
+  },
+  SET_ID: (state, id) => {
+    state.id = id
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -39,15 +60,32 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { userName } = data
+        const { userName, userId, userRole } = data;
 
-        commit('SET_NAME', userName)
+        commit('SET_NAME', userName);
+        commit('SET_ROLE', userRole);
+        commit('SET_ID', userId);
         // commit('SET_TOKEN', data.token)
         // setToken(data.token)
         resolve()
       }).catch(error => {
         reject(error)
       })
+    })
+  },
+
+  saveMemberRole({ commit, state }, projectID) {
+    commit('SET_IS_MEMBER', false);
+    commit('SET_MEMBER_ROLE', []);
+    getMembers(projectID, -1).then(res => {
+      const { data } = res;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].memberID === state.id) {
+          commit('SET_IS_MEMBER', true);
+          commit('SET_MEMBER_ROLE', data[i].memberRole);
+          break;
+        }
+      }
     })
   },
 

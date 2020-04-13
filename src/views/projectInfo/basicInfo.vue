@@ -8,9 +8,16 @@
               type="primary"
               icon="el-icon-edit"
               @click="editMode = true"
-              v-if="!editMode"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && !editMode"
             >编辑模式</el-button>
-            <el-button type="primary" icon="el-icon-view" @click="editMode = false" v-else>浏览模式</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-view"
+              @click="editMode = false"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && editMode"
+            >
+              浏览模式
+            </el-button>
           </el-col>
           <el-col :span="4" :offset="16">
             <el-button
@@ -206,6 +213,7 @@ import {
   updateProjectInfo,
   getDomainList
 } from "@/api/project";
+import {getMembers} from "@/api/Member";
 
 export default {
   name: "BasicInfo",
@@ -247,6 +255,8 @@ export default {
     };
   },
   created() {
+    this.$store.dispatch('user/saveMemberRole', this.$store.state.project.currentProjectId);
+    this.$store.commit('user/SET_IS_MONITOR', false);
     this.getProjectInfo();
     this.getDomainList();
   },
@@ -262,6 +272,7 @@ export default {
       getProjectInfo(this.form.projectID).then(response => {
         const { data } = response;
         this.form = data;
+        this.$store.commit('user/SET_IS_MONITOR', this.$store.state.user.id === data.projectMonitorID);
       });
     },
     updateProjectInfo() {
@@ -284,7 +295,7 @@ export default {
         time: "",
         contents: ""
       });
-    }
+    },
   }
 };
 </script>
