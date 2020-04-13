@@ -201,59 +201,13 @@ export default {
   data() {
     return {
       activeTabName: "riskManagement",
-      riskList: [
-        {
-          riskID: "00123",
-          riskDescription: "风险描述书aaaaaa",
-          riskType: "项目风险",
-          riskFrequency: 0,
-          riskChargerName: "小刘",
-          riskHolders: [],
-          riskLevel: "中",
-          riskInfluence: "高",
-          riskStatus: "0",
-          riskStrategy: "阿莱克斯的结婚方式绝代风华阿斯顿开发环境阿斯顿开发哈看世界的合法函数圣诞节发货科技的书法考级哈收到尽快发货"
-        },
-        {
-          riskID: "00123",
-          riskDescription: "风险描述书bbbbbb",
-          riskType: "商业风险",
-          riskFrequency: 0,
-          riskChargerName: "小刘",
-          riskLevel: "中",
-          riskInfluence: "低",
-          riskStatus: "1"
-        },
-        {
-          riskID: "00123",
-          riskDescription: "风险描述书ccccc",
-          riskType: "技术风险",
-          riskFrequency: 0,
-          riskChargerName: "小刘",
-          riskLevel: "低",
-          riskInfluence: "高",
-          riskStatus: "0"
-        }
-      ],
+      riskList: [],
       templateList: [],
       projectList: [],
       riskTypeList: ["商业风险", "项目风险", "技术风险"],
       riskLevelList: ["高", "中", "低"],
       riskInfluenceList: ["高", "中", "低"],
-      userList: [
-        {
-          memberID: "b6703879-e1e2-499c-8ffe-d8b29f71f156",
-          memberName: "tester",
-        },
-        {
-          memberID: "48fb8377-664f-4a9b-b13f-6729b00a9e22",
-          memberName: "boss",
-        },
-        {
-          memberID: "0006",
-          memberName: "0.8064611509747337",
-        }
-      ],
+      userList: [],
       dialogTitle: "登记风险",
       addFormVisible: false,
       addForm: {

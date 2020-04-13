@@ -134,15 +134,8 @@ export default {
       memberListByRole: [],
       memberCountByRole: [0, 0, 0, 0, 0, 0, 0, 0, 0],
       addUserFormTitle: "新增项目成员",
-      allUsers: [
-        { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
-      ],
-      addUserList: [
-        { userId: "b6703879-e1e2-499c-8ffe-d8b29f71f156", userName: "tester" }
-      ],
-      options: [],
-      value: [],
-      list: [],
+      allUsers: [],
+      addUserList: [],
       loading: false,
       addUserFormVisible: false,
       addUserForm: {

@@ -89,10 +89,7 @@ export default {
     return {
       activeTabName: "deviceList",
       deviceList: [],
-      deviceSearchList: [
-        "PAD-123123123123",
-        "PHONE-123123123123"
-      ],
+      deviceSearchList: [],
       memberList: [],
       addFromVisible: false,
       addFrom: {
