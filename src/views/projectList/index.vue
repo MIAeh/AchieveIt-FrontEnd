@@ -20,11 +20,11 @@
       <el-tab-pane label="全部项目" name="全部项目" />
       <el-tab-pane label="申请立项" name="申请立项" />
       <el-tab-pane label="已立项" name="已立项" />
-      <el-tab-pane label="立项驳回" name="立项驳回" />
       <el-tab-pane label="进行中" name="进行中" />
       <el-tab-pane label="已交付" name="已交付" />
       <el-tab-pane label="已结束" name="已结束" />
       <el-tab-pane label="已归档" name="已归档" />
+      <el-tab-pane label="立项驳回" name="立项驳回" />
     </el-tabs>
     <el-table :data="projectList" border style="width: 100%" @row-click="handleClickProject">
       <el-table-column prop="projectName" label="项目名称" width="180" />
@@ -69,7 +69,7 @@ export default {
   },
   filters: {
     formatProjectStatus(val) {
-      const projectListStatus = ['申请立项', '已立项', '立项驳回', '进行中', '已交付', '已结束', '已归档'];
+      const projectListStatus = ['申请立项', '已立项', '进行中', '已交付', '已结束', '已归档', '立项驳回'];
       if (val > -1 && val < projectListStatus.length) {
         return projectListStatus[val];
       } else{
