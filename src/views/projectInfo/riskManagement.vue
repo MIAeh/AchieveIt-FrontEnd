@@ -48,6 +48,7 @@
                 type="text"
                 size="small"
                 class="btn-text-green"
+                v-if="scope.row.riskStatus != '1'"
               >确认解决</el-button>
               <el-button
                 @click.stop="handleDelete(scope.row)"
