@@ -9,7 +9,7 @@
         <el-row class="dashboard-row">
           <el-col :span="4">
             <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
-                       v-if="this.$store.state.user.memberRole.includes(0)">
+                       v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status > 0 && this.$store.state.project.status != 5">
               添加成员权限
             </el-button>
           </el-col>
@@ -23,7 +23,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('Git', item.memberID)"
-                v-if="memberRole.includes(0)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -35,7 +35,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('File', item.memberID)"
-                v-if="memberRole.includes(0)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -47,7 +47,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('Mail', item.memberID)"
-                v-if="memberRole.includes(0)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -101,6 +101,7 @@ import { getMembers } from "@/api/Member";
 export default {
   data() {
     return {
+      status: 5,
       memberRole: [],
       activeTabName: "authorityManage",
       activeCollapseNames: ["1", "2", "3"],
@@ -128,6 +129,7 @@ export default {
     this.getAllAuthority();
     this.getAllMembers();
     this.memberRole = this.$store.state.user.memberRole;
+    this.status = this.$store.state.project.status;
   },
   methods: {
     getAllMembers() {

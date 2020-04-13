@@ -11,7 +11,7 @@
         <el-row class="dashboard-row">
           <el-col :span="4">
             <el-button type="primary" icon="el-icon-plus" @click="handleAddDevice"
-                       v-if="this.$store.state.user.memberRole.includes(7)">
+                       v-if="this.$store.state.user.memberRole.includes(7) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
               登记设备
             </el-button>
           </el-col>
@@ -29,7 +29,7 @@
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="120"
-                           v-if="this.$store.state.user.memberRole.includes(7)">
+                           v-if="this.$store.state.user.memberRole.includes(7) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="handleReturn(scope.row)"

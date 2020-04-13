@@ -8,13 +8,13 @@
               type="primary"
               icon="el-icon-edit"
               @click="editMode = true"
-              v-if="this.$store.state.user.id === this.form.projectManagerID && !editMode"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && !editMode && this.$store.state.project.status != 5"
             >编辑模式</el-button>
             <el-button
               type="primary"
               icon="el-icon-view"
               @click="editMode = false"
-              v-if="this.$store.state.user.id === this.form.projectManagerID && editMode"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && editMode && this.$store.state.project.status != 5"
             >
               浏览模式
             </el-button>
@@ -257,6 +257,7 @@ export default {
   created() {
     this.$store.dispatch('user/saveMemberRole', this.$store.state.project.currentProjectId);
     this.$store.commit('user/SET_IS_MONITOR', false);
+    this.$store.commit('project/setStatus', 5);
     this.getProjectInfo();
     this.getDomainList();
   },
@@ -273,6 +274,7 @@ export default {
         const { data } = response;
         this.form = data;
         this.$store.commit('user/SET_IS_MONITOR', this.$store.state.user.id === data.projectMonitorID);
+        this.$store.commit('project/setStatus', data.projectStatus);
       });
     },
     updateProjectInfo() {

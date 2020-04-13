@@ -11,7 +11,7 @@
               type="primary"
               icon="el-icon-plus"
               @click="handleAddUser"
-              v-if="this.$store.state.user.memberRole.includes(0)"
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5"
             >{{ addUserFormTitle }}</el-button>
           </el-col>
         </el-row>
@@ -32,7 +32,7 @@
           <el-table-column prop="memberRoleString" label="角色" width="200" />
           <el-table-column prop="superiorName" label="项目上级" width="200" />
           <el-table-column fixed="right" label="操作" width="140"
-                           v-if="this.$store.state.user.memberRole.includes(0)">
+                           v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="deleteMember(scope.row)"
