@@ -340,7 +340,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          deleteFeature(row.featureId).then(res => {
+          deleteFeature(row.featureId, this.$store.state.project.currentProjectId).then(res => {
             this.getFeature();
           });
         })
@@ -350,7 +350,8 @@ export default {
       updateFeatureByFeatureID(
         this.functionInfo.featureId,
         this.functionInfo.featureName,
-        this.functionInfo.featureDescription
+        this.functionInfo.featureDescription,
+        this.$store.state.project.currentProjectId
       ).then(res => {
         this.functionInfoDialogVisible = false
         this.getFeature();
