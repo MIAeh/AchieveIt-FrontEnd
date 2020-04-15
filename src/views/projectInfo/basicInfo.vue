@@ -281,7 +281,7 @@ export default {
       console.log(this.form);
       updateProjectInfo(this.form).then(response => {
         this.getProjectInfo();
-        this.editMode = false;
+        this.editMode = true;
       });
     },
     handleTabRoute(tab, event) {
