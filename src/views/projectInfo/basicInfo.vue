@@ -280,7 +280,8 @@ export default {
     updateProjectInfo() {
       console.log(this.form);
       updateProjectInfo(this.form).then(response => {
-        this.$router.push("/projectList");
+        this.getProjectInfo();
+        this.editMode = false;
       });
     },
     handleTabRoute(tab, event) {
