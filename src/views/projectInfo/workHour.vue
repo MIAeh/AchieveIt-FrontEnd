@@ -156,9 +156,9 @@ export default {
         activityName: ""
       },
       workHourFormRules: {
-        featureName: [{ required: true, message: "请选择功能名称" }],
-        activityName: [{ required: true, message: "请选择活动名称" }],
-        dateTime: [{ required: true, message: "请选择起止时间" }]
+        featureName: [{ required: true, message: "请选择功能名称", trigger: " blur"  }],
+        activityName: [{ required: true, message: "请选择活动名称", trigger: " blur"  }],
+        dateTime: [{ required: true, message: "请选择起止时间", trigger: " blur"  }]
       },
       functionList: null,
       activityList: [
