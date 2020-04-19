@@ -23,7 +23,7 @@
               style="float:right"
               @click="importFormVisible = true"
               v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
-            >导入风险</el-button>
+            导入风险</el-button>
           </el-col>
         </el-row>
         <el-table :data="riskList" border style="width: 100%" @row-click="handleEdit">

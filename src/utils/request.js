@@ -50,17 +50,18 @@ service.interceptors.response.use(
       Message({
         message: res.message || 'Error',
         type: 'error',
-        duration: 5 * 1000
+        duration: 5 * 100
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.errorCode === 50008 || res.errorCode === 50012 || res.errorCode === 50014) {
+      if (res.errorCode === 50008 || res.errorCode === 50012 || res.errorCode === 50014 || res.errorCode === 402) {
         // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
+        MessageBox.confirm('你已被登出，请选择重新登陆', '重新登陆', {
+          confirmButtonText: '重新登陆',
+          cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          sessionStorage.removeItem('userName');
           store.dispatch('user/resetToken').then(() => {
             location.reload()
           })
@@ -76,7 +77,7 @@ service.interceptors.response.use(
     Message({
       message: error.message,
       type: 'error',
-      duration: 5 * 1000
+      duration: 5 * 100
     })
     return Promise.reject(error)
   }

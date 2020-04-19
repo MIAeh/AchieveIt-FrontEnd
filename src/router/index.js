@@ -118,6 +118,7 @@ export const constantRoutes = [
   {
     path: "/project",
     component: Layout,
+    hidden: true,
     children: [
       {
         path: "addProject",

@@ -8,26 +8,24 @@
       <el-tab-pane label="权限管理" name="authorityManage"></el-tab-pane>
       <el-tab-pane label="工时管理" name="workHour">
         <el-row class="dashboard-row">
-          <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour"
-                       v-if="this.$store.state.user.isMember === true && this.$store.state.project.status != 5 && this.$store.state.project.status > 1">
-              申报工时
-            </el-button>
-          </el-col>
-          <el-col :span="2" :offset="18">
-            <el-dropdown class="dropdown-status" @command="handleStatusChange">
-              <span class="el-dropdown-link">
-                申报状态
-                <i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command=-1>全部</el-dropdown-item>
-                <el-dropdown-item command=0>待批准</el-dropdown-item>
-                <el-dropdown-item command=1>已批准</el-dropdown-item>
-                <el-dropdown-item command=2>待修改</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </el-col>
+          <el-button
+            type="primary"
+            icon="el-icon-plus"
+            @click="handleCreateWorkHour"
+            v-if="this.$store.state.user.isMember === true && this.$store.state.project.status != 5 && this.$store.state.project.status > 1"
+          >申报工时</el-button>
+          <el-dropdown class="dropdown-status" @command="handleStatusChange">
+            <span class="el-dropdown-link">
+              申报状态
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="-1">全部</el-dropdown-item>
+              <el-dropdown-item command="0">待批准</el-dropdown-item>
+              <el-dropdown-item command="1">已批准</el-dropdown-item>
+              <el-dropdown-item command="2">待修改</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </el-row>
         <el-tabs v-model="applyStatus" @tab-click="handleWorkHourTabRoute">
           <el-tab-pane label="全部申报" name="all"></el-tab-pane>
@@ -38,7 +36,12 @@
             </span>
           </el-tab-pane>
         </el-tabs>
-        <el-table :data="showWorkHourList" @row-click="handleClickWorkHour" border style="width: 100%">
+        <el-table
+          :data="showWorkHourList"
+          @row-click="handleClickWorkHour"
+          border
+          style="width: 100%"
+        >
           <el-table-column prop="workHourId" label="工时记录ID" width="180" />
           <el-table-column prop="applyTime" label="申报日期" width="180">
             <template slot-scope="scope">{{ scope.row.applyTime | formatDateString }}</template>
@@ -127,14 +130,24 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'"
-                   v-if="this.$store.state.project.status != 5">
-          保存
-        </el-button>
-        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'"
-                   v-if="this.$store.state.project.status != 5">驳回</el-button>
-        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'"
-                   v-if="this.$store.state.project.status != 5">批准</el-button>
+        <el-button
+          type="primary"
+          @click="handleSubmit"
+          v-show="newApply || applyStatus === 'my'"
+          v-if="this.$store.state.project.status != 5"
+        >保存</el-button>
+        <el-button
+          type="danger"
+          @click="handleReject"
+          v-show="!newApply && applyStatus === 'apply'"
+          v-if="this.$store.state.project.status != 5"
+        >驳回</el-button>
+        <el-button
+          type="success"
+          @click="handleApprove"
+          v-show="!newApply && applyStatus === 'apply'"
+          v-if="this.$store.state.project.status != 5"
+        >批准</el-button>
       </div>
     </el-dialog>
   </div>
@@ -143,10 +156,13 @@
 <script>
 import { getFeature } from "@/api/feature";
 import {
-  applyWorkHour, approveWorkHour,
+  applyWorkHour,
+  approveWorkHour,
   getMyWorkHoursByProjectID,
   getMyWorkHoursToApproveByProjectID,
-  getWorkHoursByProjectID, rejectWorkHour, updateWorkHour
+  getWorkHoursByProjectID,
+  rejectWorkHour,
+  updateWorkHour
 } from "@/api/workHour";
 
 export default {
@@ -168,9 +184,15 @@ export default {
         activityName: ""
       },
       workHourFormRules: {
-        featureName: [{ required: true, message: "请选择功能名称" }],
-        activityName: [{ required: true, message: "请选择活动名称" }],
-        dateTime: [{ required: true, message: "请选择起止时间" }]
+        featureName: [
+          { required: true, message: "请选择功能名称", trigger: " blur" }
+        ],
+        activityName: [
+          { required: true, message: "请选择活动名称", trigger: " blur" }
+        ],
+        dateTime: [
+          { required: true, message: "请选择起止时间", trigger: " blur" }
+        ]
       },
       functionList: null,
       statusList: ["待批准", "已批准", "待修改"],
@@ -252,11 +274,11 @@ export default {
             }
           ]
         }
-      ],
+      ]
     };
   },
   filters: {
-    ConvertStatus: function (statusNumber) {
+    ConvertStatus: function(statusNumber) {
       const statusList = ["待批准", "已批准", "待修改"];
       if (statusNumber > -1 && statusNumber < statusList.length) {
         return statusList[statusNumber];
@@ -265,40 +287,45 @@ export default {
     },
     formatDateString(timeString) {
       const date = new Date(timeString);
-      let year = date.getFullYear();//获取完整的年份(4位,1970-????)
-      let month = date.getMonth() + 1;//获取当前月份(0-11,0代表1月)
-      let day = date.getDate();//获取当前日(1-31)
+      let year = date.getFullYear(); //获取完整的年份(4位,1970-????)
+      let month = date.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+      let day = date.getDate(); //获取当前日(1-31)
       if (month < 10) {
-        month ="0" + month;
+        month = "0" + month;
       }
       if (day < 10) {
-        day ="0" + day;
+        day = "0" + day;
       }
-      return  year +"-" + month + "-" + day;
+      return year + "-" + month + "-" + day;
     }
   },
   computed: {
     workHourByStatus() {
       let workHourArray = [];
       for (let status = 0; status < 3; status++) {
-        workHourArray.push(this.workHourList.filter(item => item.status === status));
+        workHourArray.push(
+          this.workHourList.filter(item => item.status === status)
+        );
       }
       return workHourArray;
     },
     formTitle() {
-      if (this.newApply) return '登记工时记录';
-      if (this.applyStatus === 'apply') {
-        return '审批申报'
+      if (this.newApply) return "登记工时记录";
+      if (this.applyStatus === "apply") {
+        return "审批申报";
       } else {
-        return '申报详情';
+        return "申报详情";
       }
     },
     formDisabled() {
       if (this.newApply === true) return false;
-      if (this.applyStatus === 'all' || this.applyStatus === 'apply') {
+      if (this.applyStatus === "all" || this.applyStatus === "apply") {
         return true;
       }
-      if (this.applyStatus === 'my' && this.statusList[this.workHourForm.status] === '已批准') {
+      if (
+        this.applyStatus === "my" &&
+        this.statusList[this.workHourForm.status] === "已批准"
+      ) {
         return true;
       }
       return false;
@@ -322,49 +349,55 @@ export default {
         case "all":
           this.getWorkHour();
           break;
-        case 'my':
+        case "my":
           this.getMyWorkHour();
           break;
-        case 'apply':
+        case "apply":
           this.getMyWorkHoursToApprove();
       }
     },
     getWorkHour() {
-      getWorkHoursByProjectID(this.$store.state.project.currentProjectId).then(res => {
-        const { data } = res;
-        console.log(data);
-        this.workHourList = data;
-        this.showWorkHourList = this.workHourList;
-      })
+      getWorkHoursByProjectID(this.$store.state.project.currentProjectId).then(
+        res => {
+          const { data } = res;
+          console.log(data);
+          this.workHourList = data;
+          this.showWorkHourList = this.workHourList;
+        }
+      );
     },
     getMyWorkHour() {
-      getMyWorkHoursByProjectID(this.$store.state.project.currentProjectId).then(res => {
+      getMyWorkHoursByProjectID(
+        this.$store.state.project.currentProjectId
+      ).then(res => {
         const { data } = res;
         console.log(data);
         this.workHourList = data;
         this.showWorkHourList = this.workHourList;
-      })
+      });
     },
     getMyWorkHoursToApprove() {
-      getMyWorkHoursToApproveByProjectID(this.$store.state.project.currentProjectId).then(res => {
+      getMyWorkHoursToApproveByProjectID(
+        this.$store.state.project.currentProjectId
+      ).then(res => {
         const { data } = res;
         console.log(data);
         this.workHourList = data;
         this.showWorkHourList = this.workHourList;
-      })
+      });
     },
     handleTabRoute(tab) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
     handleWorkHourTabRoute(tab) {
       switch (tab.name) {
-        case 'all':
+        case "all":
           this.getWorkHour();
           break;
-        case 'my':
+        case "my":
           this.getMyWorkHour();
           break;
-        case 'apply':
+        case "apply":
           this.getMyWorkHoursToApprove();
           break;
       }
@@ -397,11 +430,11 @@ export default {
               this.workHourForm.featureName,
               this.workHourForm.activityName,
               this.workHourForm.startTime,
-              this.workHourForm.endTime,
+              this.workHourForm.endTime
             ).then(res => {
               this.workHourFormVisible = false;
               this.getCurrentWorkHour();
-            })
+            });
           }
           console.log(this.workHourForm);
         }
@@ -411,13 +444,13 @@ export default {
       rejectWorkHour(this.workHourForm.workHourId).then(res => {
         this.workHourFormVisible = false;
         this.getCurrentWorkHour();
-      })
+      });
     },
     handleApprove() {
       approveWorkHour(this.workHourForm.workHourId).then(res => {
         this.workHourFormVisible = false;
         this.getCurrentWorkHour();
-      })
+      });
     },
     handleClickWorkHour(row) {
       this.newApply = false;
@@ -450,6 +483,7 @@ export default {
 <style lang="scss">
 .dropdown-status {
   margin: 12px 0;
+  float: right;
 }
 </style>
 
