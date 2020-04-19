@@ -10,7 +10,10 @@
       <el-tab-pane label="设备列表" name="deviceList">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddDevice">登记设备</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleAddDevice"
+                       v-if="this.$store.state.user.memberRole.includes(7) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
+              登记设备
+            </el-button>
           </el-col>
         </el-row>
         <el-table :data="deviceList" border style="width: 100%">
@@ -25,7 +28,8 @@
               <el-tag type="danger" v-else-if="scope.row.deviceStatus === 'Overdue'">已逾期</el-tag>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="120">
+          <el-table-column fixed="right" label="操作" width="120"
+                           v-if="this.$store.state.user.memberRole.includes(7) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="handleReturn(scope.row)"

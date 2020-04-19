@@ -10,24 +10,26 @@ export function getFeature(projectID) {
   })
 }
 
-export function deleteFeature(featureID) {
+export function deleteFeature(featureID, projectID) {
   return request({
     url: '/feature/deleteFeatureByFeatureID',
-    method: 'get',
+    method: 'post',
     params: {
-      featureID: featureID
+      featureID: featureID,
+      projectID: projectID
     }
   })
 }
 
-export function updateFeatureByFeatureID(featureID, featureName, featureDescription) {
+export function updateFeatureByFeatureID(featureID, featureName, featureDescription, projectID) {
   return request({
     url: '/feature/updateFeatureByFeatureID',
     method: 'post',
     params: {
       featureID: featureID,
       featureName: featureName,
-      featureDescription: featureDescription
+      featureDescription: featureDescription,
+      projectID: projectID
     }
   })
 }

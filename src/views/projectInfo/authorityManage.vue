@@ -8,7 +8,10 @@
       <el-tab-pane label="权限管理" name="authorityManage">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAdd">添加成员权限</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
+                       v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status > 0 && this.$store.state.project.status != 5">
+              添加成员权限
+            </el-button>
           </el-col>
         </el-row>
         <el-collapse v-model="activeCollapseNames">
@@ -20,6 +23,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('Git', item.memberID)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -31,6 +35,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('File', item.memberID)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -42,6 +47,7 @@
                 type="text"
                 class="btn-text-red"
                 @click="handleDelete('Mail', item.memberID)"
+                v-if="memberRole.includes(0) && status != 5"
               >删除</el-button>
             </div>
           </el-collapse-item>
@@ -95,6 +101,8 @@ import { getMembers } from "@/api/Member";
 export default {
   data() {
     return {
+      status: 5,
+      memberRole: [],
       activeTabName: "authorityManage",
       activeCollapseNames: ["1", "2", "3"],
       addFormVisible: false,
@@ -120,6 +128,8 @@ export default {
   created() {
     this.getAllAuthority();
     this.getAllMembers();
+    this.memberRole = this.$store.state.user.memberRole;
+    this.status = this.$store.state.project.status;
   },
   methods: {
     getAllMembers() {

@@ -3,7 +3,9 @@
     <el-tabs v-model="currentTabName" type="border-card" @tab-click="handleTabsClick">
       <el-row class="dashboard-row">
         <el-col :span="4">
-          <el-button type="primary" icon="el-icon-plus" @click="handleAddProject">新建项目</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleAddProject"
+                     v-if="this.$store.state.user.role === 0">
+            新建项目</el-button>
         </el-col>
         <el-col :span="8" :offset="12">
           <el-input
@@ -15,69 +17,30 @@
           </el-input>
         </el-col>
       </el-row>
-      <el-tab-pane label="全部项目" name="全部项目">
-        <el-table :data="allProject" border style="width: 100%" @row-click="handleClickProject">
-          <el-table-column prop="projectName" label="项目名称" width="180" />
-          <el-table-column prop="projectStatus" label="项目状态" width="120">
-            <template slot-scope="scope">{{ scope.row.projectStatus | formatProjectStatus }}</template>
-          </el-table-column>
-          <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
-          <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectClientContactName" label="客户名称" />
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="未开始" name="未开始">
-        <el-table :data="startProject" border style="width: 100%" @row-click="handleClickProject">
-          <el-table-column prop="projectName" label="项目名称" width="180" />
-          <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
-          <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
-          <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectClientContactName" label="客户名称" />
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="进行中" name="进行中" @row-click="handleClickProject">
-        <el-table :data="underwayProject" border style="width: 100%">
-          <el-table-column prop="projectName" label="项目名称" width="180" />
-          <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
-          <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
-          <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectClientContactName" label="客户名称" />
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="已完成" name="已完成" @row-click="handleClickProject">
-        <el-table :data="finishedProject" border style="width: 100%">
-          <el-table-column prop="projectName" label="项目名称" width="180" />
-          <!-- <el-table-column prop="projectStatus" label="项目状态" width="120" /> -->
-          <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
-          <el-table-column prop="projectManagerName" label="项目经理" width="120" />
-          <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
-            <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
-          </el-table-column>
-          <el-table-column prop="projectClientContactName" label="客户名称" />
-        </el-table>
-      </el-tab-pane>
+      <el-tab-pane label="全部项目" name="全部项目" />
+      <el-tab-pane label="申请立项" name="申请立项" />
+      <el-tab-pane label="已立项" name="已立项" />
+      <el-tab-pane label="进行中" name="进行中" />
+      <el-tab-pane label="已交付" name="已交付" />
+      <el-tab-pane label="已结束" name="已结束" />
+      <el-tab-pane label="已归档" name="已归档" />
+      <el-tab-pane label="立项驳回" name="立项驳回" />
     </el-tabs>
+    <el-table :data="projectList" border style="width: 100%" @row-click="handleClickProject">
+      <el-table-column prop="projectName" label="项目名称" width="180" />
+      <el-table-column prop="projectStatus" label="项目状态" width="120">
+        <template slot-scope="scope">{{ scope.row.projectStatus | formatProjectStatus }}</template>
+      </el-table-column>
+      <!--          <el-table-column prop="projectManagerName" label="项目上级" width="120" />-->
+      <el-table-column prop="projectManagerName" label="项目经理" width="120" />
+      <el-table-column prop="projectStartDate" label="计划开始时间" width="180">
+        <template slot-scope="scope">{{ scope.row.projectStartDate | formatDateString }}</template>
+      </el-table-column>
+      <el-table-column prop="projectEndDate" label="计划结束时间" width="180">
+        <template slot-scope="scope">{{ scope.row.projectEndDate | formatDateString }}</template>
+      </el-table-column>
+      <el-table-column prop="projectClientContactName" label="客户名称" />
+    </el-table>
   </div>
 </template>
 
@@ -94,6 +57,7 @@ export default {
         size: 10,
         searchCondition: ""
       },
+      projectList: [],
       allProject: [],
       underwayProject: [],
       startProject: [],
@@ -101,11 +65,16 @@ export default {
     };
   },
   created: function() {
-    this.getAllProject();
+    this.getProjectList(-1);
   },
   filters: {
     formatProjectStatus(val) {
-      return 0 ? "未开始" : 1 ? "进行中" : 2 ? "已完成" : val;
+      const projectListStatus = ['申请立项', '已立项', '进行中', '已交付', '已结束', '已归档', '立项驳回'];
+      if (val > -1 && val < projectListStatus.length) {
+        return projectListStatus[val];
+      } else{
+        return val;
+      }
     },
     formatDateString(timeString) {
       const date = new Date(timeString);
@@ -124,20 +93,27 @@ export default {
   methods: {
     handleTabsClick(tab) {
       this.listQuery.searchCondition = "";
-      switch (tab.label) {
-        case "全部项目":
-          this.getAllProject();
-          break;
-        case "未开始":
-          this.getStartProject();
-          break;
-        case "进行中":
-          this.getUnderwayProject();
-          break;
-        case "已完成":
-          this.getFinishedProject();
-          break;
-      }
+      this.getProjectList(tab.index - 1);
+      // switch (tab.label) {
+      //   case "全部项目":
+      //     this.getAllProject();
+      //     break;
+      //   case "未开始":
+      //     this.getStartProject();
+      //     break;
+      //   case "进行中":
+      //     this.getUnderwayProject();
+      //     break;
+      //   case "已完成":
+      //     this.getFinishedProject();
+      //     break;
+      // }
+    },
+    getProjectList(projectStatus) {
+      getProjectList("", projectStatus).then(response => {
+        const { data } = response;
+        this.projectList = data;
+      })
     },
     getAllProject() {
       getProjectList("", -1).then(response => {
@@ -169,7 +145,7 @@ export default {
     searchProject() {
       getProjectList(this.listQuery.searchCondition, -1).then(response => {
         const { data } = response;
-        this.allProject = data;
+        this.projectList = data;
         this.currentTabName = "全部项目";
       });
     },

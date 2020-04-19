@@ -8,9 +8,16 @@
               type="primary"
               icon="el-icon-edit"
               @click="editMode = true"
-              v-if="!editMode"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && !editMode && this.$store.state.project.status != 5"
             >编辑模式</el-button>
-            <el-button type="primary" icon="el-icon-view" @click="editMode = false" v-else>浏览模式</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-view"
+              @click="editMode = false"
+              v-if="this.$store.state.user.id === this.form.projectManagerID && editMode && this.$store.state.project.status != 5"
+            >
+              浏览模式
+            </el-button>
           </el-col>
           <el-col :span="4" :offset="16">
             <el-button
@@ -206,6 +213,7 @@ import {
   updateProjectInfo,
   getDomainList
 } from "@/api/project";
+import {getMembers} from "@/api/Member";
 
 export default {
   name: "BasicInfo",
@@ -247,6 +255,9 @@ export default {
     };
   },
   created() {
+    this.$store.dispatch('user/saveMemberRole', this.$store.state.project.currentProjectId);
+    this.$store.commit('user/SET_IS_MONITOR', false);
+    this.$store.commit('project/setStatus', 5);
     this.getProjectInfo();
     this.getDomainList();
   },
@@ -262,12 +273,15 @@ export default {
       getProjectInfo(this.form.projectID).then(response => {
         const { data } = response;
         this.form = data;
+        this.$store.commit('user/SET_IS_MONITOR', this.$store.state.user.id === data.projectMonitorID);
+        this.$store.commit('project/setStatus', data.projectStatus);
       });
     },
     updateProjectInfo() {
       console.log(this.form);
       updateProjectInfo(this.form).then(response => {
-        this.$router.push("/projectList");
+        this.getProjectInfo();
+        this.editMode = true;
       });
     },
     handleTabRoute(tab, event) {
@@ -284,7 +298,7 @@ export default {
         time: "",
         contents: ""
       });
-    }
+    },
   }
 };
 </script>

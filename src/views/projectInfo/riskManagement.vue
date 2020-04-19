@@ -11,7 +11,10 @@
       <el-tab-pane label="风险管理" name="riskManagement">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk">登记风险</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleAddRisk"
+                       v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
+              登记风险
+            </el-button>
           </el-col>
           <el-col :span="4" :offset="16">
             <el-button
@@ -19,6 +22,7 @@
               icon="el-icon-download"
               style="float:right"
               @click="importFormVisible = true"
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             >导入风险</el-button>
           </el-col>
         </el-row>
@@ -41,13 +45,15 @@
               <el-tag type="danger" v-else>处理中</el-tag>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="120">
+          <el-table-column fixed="right" label="操作" width="120"
+                           v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
             <template slot-scope="scope">
               <el-button
                 @click.stop="handlePass(scope.row)"
                 type="text"
                 size="small"
                 class="btn-text-green"
+                v-if="scope.row.riskStatus != '1'"
               >确认解决</el-button>
               <el-button
                 @click.stop="handleDelete(scope.row)"
@@ -62,7 +68,7 @@
     </el-tabs>
 
     <el-dialog :title="dialogTitle" :visible.sync="addFormVisible">
-      <el-form :model="addForm" label-width="100px" label-position="center">
+      <el-form :model="addForm" :disabled="formDisable" label-width="100px" label-position="center">
         <el-row>
           <el-form-item label="风险描述">
             <el-input v-model="addForm.riskDescription"></el-input>
@@ -124,7 +130,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">提交</el-button>
+        <el-button type="primary" @click="handleSubmit"
+                   v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5  && this.$store.state.project.status > 1">
+          提交
+        </el-button>
       </div>
     </el-dialog>
 
@@ -257,6 +266,11 @@ export default {
       }
     },
   },
+  computed: {
+    formDisable() {
+      return this.dialogTitle === '风险详情';
+    },
+  },
   created() {
     this.getRisk();
   },
@@ -306,13 +320,19 @@ export default {
         this.addRisk();
       } else if (this.dialogTitle === "编辑风险") {
         this.updateRisk();
+      } else {
+        this.addFormVisible = false;
       }
     },
     handleEdit(row) {
       this.getMemberList();
       this.addFormVisible = true;
       this.addForm = { ...row };
-      this.dialogTitle = "编辑风险";
+      if (row.riskStatus == '1') {
+        this.dialogTitle = "风险详情";
+      } else {
+        this.dialogTitle = "编辑风险";
+      }
     },
     handleImportTypeChange() {
       if (this.importForm.importType === "标准风险库") {

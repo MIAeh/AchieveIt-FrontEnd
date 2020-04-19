@@ -9,7 +9,10 @@
       <el-tab-pane label="工时管理" name="workHour">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour">申报工时</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="handleCreateWorkHour"
+                       v-if="this.$store.state.user.isMember === true && this.$store.state.project.status != 5 && this.$store.state.project.status > 1">
+              申报工时
+            </el-button>
           </el-col>
           <el-col :span="2" :offset="18">
             <el-dropdown class="dropdown-status" @command="handleStatusChange">
@@ -37,7 +40,9 @@
         </el-tabs>
         <el-table :data="showWorkHourList" @row-click="handleClickWorkHour" border style="width: 100%">
           <el-table-column prop="workHourId" label="工时记录ID" width="180" />
-          <el-table-column prop="applyTime" label="申报日期" width="180" />
+          <el-table-column prop="applyTime" label="申报日期" width="180">
+            <template slot-scope="scope">{{ scope.row.applyTime | formatDateString }}</template>
+          </el-table-column>
           <el-table-column prop="applyerName" label="申报人" width="180" />
           <el-table-column prop="approverName" label="审批人" width="180" />
           <el-table-column prop="featureName" label="相关功能" />
@@ -50,22 +55,23 @@
       <el-tab-pane label="风险管理" name="riskManagement"></el-tab-pane>
     </el-tabs>
 
-    <el-dialog title="登记工时记录" :visible.sync="workHourFormVisible">
+    <el-dialog :title="formTitle" :visible.sync="workHourFormVisible">
       <el-form
         ref="workHourForm"
         :model="workHourForm"
         :rules="workHourFormRules"
         label-width="100px"
         label-position="center"
+        :disabled="formDisabled"
       >
-        <el-row>
+        <el-row v-if="formTitle !== '登记工时记录'">
           <el-col :span="12">
             <el-form-item label="申报日期">
               <el-input v-model="workHourForm.applyTime" :readonly="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row v-if="formTitle !== '登记工时记录'">
           <el-col :span="12">
             <el-form-item label="申报人">
               <el-input v-model="workHourForm.applyerName" :readonly="true"></el-input>
@@ -121,9 +127,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'">保存</el-button>
-        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'">驳回</el-button>
-        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'">批准</el-button>
+        <el-button type="primary" @click="handleSubmit" v-show="newApply || applyStatus === 'my'"
+                   v-if="this.$store.state.project.status != 5">
+          保存
+        </el-button>
+        <el-button type="danger" @click="handleReject" v-show="!newApply && applyStatus === 'apply'"
+                   v-if="this.$store.state.project.status != 5">驳回</el-button>
+        <el-button type="success" @click="handleApprove" v-show="!newApply && applyStatus === 'apply'"
+                   v-if="this.$store.state.project.status != 5">批准</el-button>
       </div>
     </el-dialog>
   </div>
@@ -148,6 +159,7 @@ export default {
       newApply: false,
       workHourFormVisible: false,
       workHourForm: {
+        workHourId: "",
         applyTime: "",
         applyerName: "",
         approverName: "",
@@ -161,6 +173,7 @@ export default {
         dateTime: [{ required: true, message: "请选择起止时间", trigger: " blur"  }]
       },
       functionList: null,
+      statusList: ["待批准", "已批准", "待修改"],
       activityList: [
         {
           label: "工程活动",
@@ -244,20 +257,25 @@ export default {
   },
   filters: {
     ConvertStatus: function (statusNumber) {
-      let statusString = '';
-      switch (statusNumber) {
-        case 0:
-          statusString =  "待批准";
-          break;
-        case 1:
-          statusString =  "已批准";
-          break;
-        case 2:
-          statusString =  "待修改";
-          break;
+      const statusList = ["待批准", "已批准", "待修改"];
+      if (statusNumber > -1 && statusNumber < statusList.length) {
+        return statusList[statusNumber];
       }
-      return statusString;
+      return statusNumber;
     },
+    formatDateString(timeString) {
+      const date = new Date(timeString);
+      let year = date.getFullYear();//获取完整的年份(4位,1970-????)
+      let month = date.getMonth() + 1;//获取当前月份(0-11,0代表1月)
+      let day = date.getDate();//获取当前日(1-31)
+      if (month < 10) {
+        month ="0" + month;
+      }
+      if (day < 10) {
+        day ="0" + day;
+      }
+      return  year +"-" + month + "-" + day;
+    }
   },
   computed: {
     workHourByStatus() {
@@ -266,6 +284,24 @@ export default {
         workHourArray.push(this.workHourList.filter(item => item.status === status));
       }
       return workHourArray;
+    },
+    formTitle() {
+      if (this.newApply) return '登记工时记录';
+      if (this.applyStatus === 'apply') {
+        return '审批申报'
+      } else {
+        return '申报详情';
+      }
+    },
+    formDisabled() {
+      if (this.newApply === true) return false;
+      if (this.applyStatus === 'all' || this.applyStatus === 'apply') {
+        return true;
+      }
+      if (this.applyStatus === 'my' && this.statusList[this.workHourForm.status] === '已批准') {
+        return true;
+      }
+      return false;
     }
   },
   created() {
@@ -317,7 +353,7 @@ export default {
         this.showWorkHourList = this.workHourList;
       })
     },
-    handleTabRoute(tab, event) {
+    handleTabRoute(tab) {
       this.$router.push(`/projectInfo/${tab.name}`);
     },
     handleWorkHourTabRoute(tab) {

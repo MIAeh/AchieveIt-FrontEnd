@@ -11,6 +11,7 @@
               type="primary"
               icon="el-icon-plus"
               @click="handleAddUser"
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5"
             >{{ addUserFormTitle }}</el-button>
           </el-col>
         </el-row>
@@ -18,11 +19,11 @@
           <el-tab-pane :label="'项目成员('+memberCountByRole[0]+')'"></el-tab-pane>
           <el-tab-pane :label="'项目经理('+memberCountByRole[1]+')'"></el-tab-pane>
           <el-tab-pane :label="'QA('+memberCountByRole[2]+')'"></el-tab-pane>
-          <el-tab-pane :label="'QALeader('+memberCountByRole[3]+')'"></el-tab-pane>
+          <el-tab-pane :label="'EPG('+memberCountByRole[3]+')'"></el-tab-pane>
           <el-tab-pane :label="'开发('+memberCountByRole[4]+')'"></el-tab-pane>
           <el-tab-pane :label="'开发Leader('+memberCountByRole[5]+')'"></el-tab-pane>
-          <el-tab-pane :label="'EPG('+memberCountByRole[6]+')'"></el-tab-pane>
-          <el-tab-pane :label="'测试('+memberCountByRole[7]+')'"></el-tab-pane>
+          <el-tab-pane :label="'测试('+memberCountByRole[6]+')'"></el-tab-pane>
+          <el-tab-pane :label="'测试Leader('+memberCountByRole[7]+')'"></el-tab-pane>
           <el-tab-pane :label="'资产管理者('+memberCountByRole[8]+')'"></el-tab-pane>
         </el-tabs>
         <el-table :data="displayedMemberList" border style="width: 100%">
@@ -30,13 +31,15 @@
           <el-table-column prop="memberMail" label="邮箱" />
           <el-table-column prop="memberRoleString" label="角色" width="200" />
           <el-table-column prop="superiorName" label="项目上级" width="200" />
-          <el-table-column fixed="right" label="操作" width="140">
+          <el-table-column fixed="right" label="操作" width="140"
+                           v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="deleteMember(scope.row)"
                 type="text"
                 size="small"
                 class="btn-text-red"
+                v-if="currentTab != '1'"
               >删除</el-button>
               <el-button
                 type="text"
@@ -150,11 +153,11 @@ export default {
       memberRoleTypeList: [
         "项目经理",
         "QA",
-        "QALeader",
+        "EPG",
         "开发",
         "开发Leader",
-        "EPG",
         "测试",
+        "测试Leader",
         "资产管理者"
       ],
       currentTab: "0"

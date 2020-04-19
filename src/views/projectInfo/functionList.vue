@@ -6,7 +6,14 @@
       <el-tab-pane label="功能列表" name="functionList">
         <el-row class="dashboard-row">
           <el-col :span="4">
-            <el-button type="primary" icon="el-icon-plus" @click="showCreateFunctionDialog">新建功能</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              @click="showCreateFunctionDialog"
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5"
+            >
+              新建功能
+            </el-button>
           </el-col>
           <el-col :span="3" :offset="14">
             <ele-import
@@ -27,6 +34,7 @@
               icon="el-icon-download"
               style="float:right"
               @click="importForm.visible = true"
+              v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5"
             >导入</el-button>
           </el-col>
           <el-col :span="3">
@@ -35,6 +43,7 @@
               icon="el-icon-upload2"
               style="float:right"
               @click="handleDownloadExcel"
+              v-if="this.$store.state.user.isMember === true && this.$store.state.project.status != 5"
             >导出</el-button>
           </el-col>
         </el-row>
@@ -49,7 +58,8 @@
         >
           <el-table-column prop="featureId" label="ID" :show-overflow-tooltip="true" width="300" />
           <el-table-column prop="featureName" label="标题" :show-overflow-tooltip="true" />
-          <el-table-column fixed="right" label="操作" width="80">
+          <el-table-column fixed="right" label="操作" width="80"
+                           v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="deleteFeature(scope.row)"
@@ -146,7 +156,10 @@
       </el-form>
       <span slot="footer">
         <el-button @click="functionInfoDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="updateFeature">保 存</el-button>
+        <el-button type="primary" @click="updateFeature"
+                   v-if="this.$store.state.user.memberRole.includes(0) && this.$store.state.project.status != 5">
+          保 存
+        </el-button>
       </span>
     </el-dialog>
   </div>
@@ -327,7 +340,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          deleteFeature(row.featureId).then(res => {
+          deleteFeature(row.featureId, this.$store.state.project.currentProjectId).then(res => {
             this.getFeature();
           });
         })
@@ -337,7 +350,8 @@ export default {
       updateFeatureByFeatureID(
         this.functionInfo.featureId,
         this.functionInfo.featureName,
-        this.functionInfo.featureDescription
+        this.functionInfo.featureDescription,
+        this.$store.state.project.currentProjectId
       ).then(res => {
         this.functionInfoDialogVisible = false
         this.getFeature();
